@@ -96,19 +96,19 @@ public class NewAccount extends HttpServlet {
 				}
 				else {
 					//Register user in the database and return a new page with favorites and logout
-					/**PreparedStatement newuser = connection.prepareStatement("INSERT INTO userinfo VALUES (?, ?, ?)");
+					PreparedStatement newuser = connection.prepareStatement("INSERT INTO userinfo VALUES (?, ?, ?)");
 					newuser.setString(1, email);
 					newuser.setString(2, username);
 					newuser.setString(3, password);
-					newuser.execute();**/
+					newuser.execute();
 					/**request.setAttribute("loggedIn", "true");
 					request.setAttribute("username", username);
 					next = "/homePage.jsp";**/
-					/**try {
+					try {
 						newuser.close();
 					} catch (SQLException sqle) {
 						System.out.println(sqle.getMessage());
-					}**/
+					}
 					
 					//Sending confirmation email 
 					//Initializing variables
