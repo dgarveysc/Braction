@@ -13,6 +13,37 @@ import java.util.Date;
 
 public class StatsMethods {
 
+	
+	public static Boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2)
+	{
+		Connection conn = null;
+		Statement st = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
+			//get all statIDs corresponding to a user
+
+		    ps = conn.prepareStatement("INSERT INTO Opponents(userToGameStatsID1, userToGameStatsID2) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+		    		    
+		    ps.setInt(1, userToGameStatsID1);
+			ps.setInt(2, userToGameStatsID2);
+
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			return true;
+		    
+		}
+		catch(SQLException se)
+		{
+			System.out.println(se.getMessage());
+			return false;
+		}
+	}
+
+	
+	
 	public static Boolean updateStats(int userToGameStatsID, int round, Boolean won)
 	{
 		//take userToGameStatsID to get userID and statsID
@@ -46,7 +77,6 @@ public class StatsMethods {
 			//get all statIDs corresponding to a user
 
 		    rs = st.executeQuery("SELECT * FROM UserToGameStats WHERE userToGameStatsID=" + userToGameStatsID);
-		    
 		    
 		    // get userID and statsID
 		    rs.next();
@@ -108,14 +138,14 @@ public class StatsMethods {
 			    winStatsID = rs.getInt("statsID");		    
 			}
 		    
-		    
+		    /*
 		    System.out.println("winUserGameStatsID = " + winUserGameStatsID);
 		    System.out.println("loseUserGameStatsID = " + winUserGameStatsID);
 		    System.out.println("winUserID = " + winUserID);
 		    System.out.println("loseUserID = " + loseUserID);
 		    System.out.println("winStatsID = " + winStatsID);
 		    System.out.println("loseStatsID = " + loseStatsID);
-
+		     */
 
 
 
@@ -137,9 +167,10 @@ public class StatsMethods {
 		    	}
 		    }
 		    
+		    /*
 		    System.out.println("winCurElo = " + winCurElo);
 		    System.out.println("loseCurElo = " + loseCurElo);
-
+		     */
 		    
 		    //get date in string
 		    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -155,9 +186,10 @@ public class StatsMethods {
 			winEloChange = (int) Math.round(k*(1-probForWinUser));
 			loseEloChange = (int) Math.round(k*(0-probForLoseUser));
 			
+			/*
 			System.out.println("winEloChange = " + winEloChange);
 			System.out.println("loseEloChange = " + loseEloChange);
-
+			 */
 			
 			//now update the statsID table
 			st.executeUpdate("UPDATE Stats SET won = TRUE, bracketRound = " + round + 
@@ -168,7 +200,6 @@ public class StatsMethods {
 					", xp = " + loseEloChange + ", gameDate = '" + curDate + 
 					"', oppRank = " + winCurElo + " WHERE statsID = " + loseStatsID);
 			
-			System.out.println("Got here 2");
 
 			//now just update ranks of both users
 			
@@ -176,14 +207,14 @@ public class StatsMethods {
 					+ "SET points = " + (winEloChange + winCurElo)
 					+ " WHERE UserID = " + winUserID);
 
-			System.out.println("Win userID = " + winUserID);
-			System.out.println("Lose userID = " + loseUserID);
 			
 			st.executeUpdate("UPDATE Users "
 					+ "SET points = " + (loseEloChange + loseCurElo)
 					+ " WHERE UserID = " + loseUserID);
 		    
 			return true;
+			
+			
 		}
 		catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -232,5 +263,4 @@ public class StatsMethods {
 			return 0;
 		}
 	}
-	
 }
