@@ -117,20 +117,20 @@ public class NewAccount extends HttpServlet {
 				    String recipientAddress = email;
 
 			        //Setting properties
-			        Properties props = System.getProperties();
+			        Properties properties = System.getProperties();
 			        String sender = bractionEmail;
 			        String pass = bractionPass;
 			        String host = "smtp.gmail.com";
-			        props.put("mail.smtp.starttls.enable", "true");
-			        props.put("mail.smtp.host", host);
-			        props.put("mail.smtp.user", sender);
-			        props.put("mail.smtp.password", pass);
-			        props.put("mail.smtp.port", "587");
-			        props.put("mail.smtp.auth", "true");
+			        properties.put("mail.smtp.starttls.enable", "true");
+			        properties.put("mail.smtp.host", host);
+			        properties.put("mail.smtp.user", sender);
+			        properties.put("mail.smtp.password", pass);
+			        properties.put("mail.smtp.port", "587");
+			        properties.put("mail.smtp.auth", "true");
 
 			        //Creating the message and session
-			        Session session = Session.getDefaultInstance(props);
-			        MimeMessage message = new MimeMessage(Session.getDefaultInstance(props));
+			        Session session = Session.getDefaultInstance(properties);
+			        MimeMessage message = new MimeMessage(Session.getDefaultInstance(properties));
 
 			        try {
 			            message.setFrom(new InternetAddress(sender));
