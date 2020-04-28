@@ -1,3 +1,5 @@
+package Stats;
+
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,6 +20,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 @WebServlet("/Stats")
 public class Stats extends HttpServlet {
@@ -28,7 +37,9 @@ public class Stats extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String testID = request.getAttribute("testID");
+		String testID = request.getParameter("testID");
+		
+		System.out.println("testID is " + testID);
 		
 		Connection conn = null;
 		Statement st = null;
@@ -37,24 +48,32 @@ public class Stats extends HttpServlet {
 		ResultSet rs2 = null;
 
 		Set<Integer> statIDs = null;
+		
+		Boolean noGames = false;
 
 		//should count wins, losses, and upcoming!
 
 		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
 			st = conn.createStatement();
 
 			//get all statIDs corresponding to a user
-			rs = st.executeQuery("SELECT * FROM UserToBracket"
+			rs = st.executeQuery("SELECT * FROM UserToGameStats"
 					+ " WHERE userID = " + testID);
 
 			statIDs = new HashSet<Integer>();
 			while (rs.next()) { //now put all statIDs into vector
-
 				//ASSUME statID always exists
 				statIDs.add(rs.getInt("statsID"));
+				System.out.println("Adding statsID = " + rs.getInt("statsID"));
 			}
 			
+			if(statIDs.isEmpty())
+			{
+				noGames = true;
+			}
+				
 			
 			//get table of all statsID for user
 			rs2 = st.executeQuery("SELECT * FROM Stats"
@@ -71,6 +90,8 @@ public class Stats extends HttpServlet {
 			Double avgOppRank = 0.0;
 			Date gameDate = null;
 
+			System.out.println("Got here 1");
+			
 			//List of EloChanges
 			List<EloDate> eloChanges = new Vector<EloDate>();
 
@@ -88,6 +109,7 @@ public class Stats extends HttpServlet {
 
 				boolean won = rs2.getBoolean("won");
 				Integer oppRank = rs2.getInt("oppRank");
+				System.out.println("OppRank = " + oppRank);
 
 
 				if(won) //update wins and rank of opponents you beat
@@ -102,7 +124,7 @@ public class Stats extends HttpServlet {
 				numPlayed++;
 
 				//rounds span from 1-3, add total rounds
-				Integer round = rs2.getInt("round");
+				Integer round = rs2.getInt("bracketRound");
 				sumRounds += round;
 
 				if(round == 3 && won) //condition to check if won bracket
@@ -110,11 +132,6 @@ public class Stats extends HttpServlet {
 					numBWins++;
 				}
 
-				Integer prize = rs2.getInt("prize");
-				if(prize != null)
-				{
-					numEarned += prize;
-				}
 
 				Integer eloChange = rs2.getInt("xp");
 
@@ -127,6 +144,15 @@ public class Stats extends HttpServlet {
 				eloChanges.add(ed);
 
 			}
+			if(numPlayed == 0 || noGames) // NO GAMES PLAYED
+			{
+				request.setAttribute("numPlayed", 0);
+				request.setAttribute("elo", 1000);
+				
+				throw new Exception("No games played");
+				
+			}
+			System.out.println("Got here 2");
 
 			//VERIFY THAT THE USERS TESTID IS VALID, CATCH EXCEPTION
 			String userIDString = String.valueOf(testID);
@@ -136,7 +162,7 @@ public class Stats extends HttpServlet {
 			eloChanges.sort(new EloComparator());
 
 
-			FileWriter fw = new FileWriter(userIDString + ".txt");
+			FileWriter fw = new FileWriter("C:\\Users\\arico\\eclipse-workspace\\testWeb\\src\\Stats\\" + userIDString + ".txt");
 			PrintWriter pw = new PrintWriter(fw);
 
 			int curElo = 1000;
@@ -145,12 +171,15 @@ public class Stats extends HttpServlet {
 			Vector<Integer> oppRkWins = new Vector<Integer>();
 			Vector<Integer> oppRkLosses = new Vector<Integer>();
 
+			System.out.println("Got here 3");
 
 			//now output list to file, of scores not changes or oppRank:
 			pw.print("1000\n");
 			for(int i = 0; i < eloChanges.size(); i++)
 			{
+				System.out.println("curElo printing is: " + curElo);
 				curElo += eloChanges.get(i).getElo();
+				System.out.println("after curElo printing is: " + curElo);
 				if(i == eloChanges.size()-1)
 				{
 					pw.print(curElo);
@@ -169,10 +198,13 @@ public class Stats extends HttpServlet {
 				}
 
 			}
+			pw.flush();
+			System.out.println("Got here 4");
 
-
+			
+			
 			// now run Python script thru matPlotLib
-			ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\arico\\Desktop\\test.py", userIDString);
+			ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\arico\\eclipse-workspace\\testWeb\\src\\Stats\\plot.py", userIDString);
 			Process p = pb.start();
 				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
 			// wait until done then continue with other stuff
@@ -180,13 +212,16 @@ public class Stats extends HttpServlet {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
 			String pyInput = br.readLine(); //should buffer
+			System.out.println("PyInput is " + pyInput);
 
-			if(!pyInput.contentEquals("Sucess"))  // figure out how to handle
+			if(!pyInput.contentEquals("Success"))  // figure out how to handle
 			{
 				System.out.println("PYTHON SCRIPT DID NOT WORK");
 			}
 
+			System.out.println("Got here 5");
 
+			
 			// process data and output avg opp rank over winning games
 			Double wRank5 = 0.0;
 			Double wRank20 = 0.0;
@@ -335,6 +370,33 @@ public class Stats extends HttpServlet {
 			request.setAttribute("avgRound", avgRound);
 			request.setAttribute("numBWins", numBWins);
 			request.setAttribute("elo", curElo);
+			
+			// here System printing
+			System.out.println("numPlayed" + numPlayed);
+			System.out.println("numWins" + numWins);
+			System.out.println("numLosses" + numLosses);
+
+			System.out.println("avgOppW5" + wRank5);
+			System.out.println("avgOppW20" + wRank20);
+			System.out.println("avgOppWAll" + wRankAll);
+			
+			System.out.println("avgOppL5" + lRank5);
+			System.out.println("avgOppL20" + lRank20);
+			System.out.println("avgOppLAll" + lRankAll);
+
+			
+			System.out.println("win25" + win25);
+			System.out.println("win50" + win50);
+			System.out.println("win75" + win75);
+			System.out.println("lose25" + lose25);
+			System.out.println("lose50" + lose50);
+			System.out.println("lose75" + lose75);
+			
+			
+			System.out.println("avgOppRank" + avgOppRank);
+			System.out.println("avgRound" + avgRound);
+			System.out.println("numBWins" + numBWins);
+			System.out.println("elo" + curElo);
 
 
 			if(numPlayed != 0)
@@ -352,7 +414,15 @@ public class Stats extends HttpServlet {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
+		} 
+		catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
 			try {
 				if (rs != null) {
 					rs.close();
