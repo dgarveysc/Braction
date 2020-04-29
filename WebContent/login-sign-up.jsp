@@ -1,4 +1,4 @@
-<%@ page language="Java" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
 
@@ -8,12 +8,13 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Login/Sign-Up</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="sty.css">
     <script>
         function authenticateUser() {
@@ -21,20 +22,28 @@
             if (v == false) {
                 return false;
             }
+            
+            var success = true;
+            
             // Using jQuery 
             $.ajax({
-                url: 'Login',
+                url: "Login",
                 data: {
                     uname: document.localSI.Username.value,
                     pword: document.localSI.Password.value
+                    
                 },
+                async: false,
                 //Making the tournament ID code show up on screen
-                success: function (result) {
-                    $("#lsipe").html(result);
+                success: function(result){
+                	if(result[0] === "<")
+                	{
+                		$( "#badLogin" ).html(result);
+                		success = false;
+                	}
                 }
-
             });
-            return false;
+            return success;
         }
 
         function createNewUser() {
@@ -48,13 +57,13 @@
                 data: {
                     email: document.localSU.email.value,
                     uname: document.localSU.username.value,
-                    pword: document.localSU.password.value
+                    pword: document.localSU.password.value,
+                    cpword: document.localSU.confirmPass.value,
+                    natAndc: document.localSU.natAndc.value
                 },
-                //Making the tournament ID code show up on screen
-                success: function (result) {
-                    $("#nisee").html(result);
+                success: function(result){
+                	$( "#loginTaken").html(result);
                 }
-
             });
             return false;
 
@@ -65,16 +74,18 @@
 </head>
 
 <body>
+
     <% 
-        String error = request.getParameter("loginError");
-        if(error == null){
-            error = "";
-        }
-        String emailTaken = request.getParameter("signUpError");
-        if(emailTaken == null){
-            emailTaken = "";
-        }
-    %>
+		
+		HttpSession s = request.getSession();
+		
+		String username = (String)s.getAttribute("username");
+		if(username != null){
+			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/profile.jsp");
+			dispatch.forward(request, response);
+		}
+		
+	%>
     <div class="container">
         <div class="row">
 
@@ -90,20 +101,14 @@
             <div class="col">
 
                 <div class="nav-area">
-                    <a href="homepage.html">
+                    <a href="index.jsp">
                         <input type="submit" class="button home-button" value="Home" id="active">
                     </a>
-                    <a href="createTournament.html">
+                    <a href="createTournament.jsp">
                         <input type="submit" class="button create-button" value="Create Tournament">
                     </a>
-                    <form method="GET" action="brackedIdServlet">
-                        <!-- User ID -->
-                        <input type="hidden" name="userID" value="1">
-                        <a href="profile.jsp">
-                            <input type="submit" class="button profile-button" value="Profile">
-                        </a>
-                    </form>
-                    <a href="login-sign-up.jsp">
+                
+                    <a href="#">
                         <input type="submit" class="button login-button" value="Login/Sign Up">
                     </a>
                 </div>
@@ -114,13 +119,13 @@
         <hr width="100%" style="padding-bottom: 5%">
         <div class="row main">
             <div class="col text">
-                <form onsubmit="return authenticateUser()" class="login" action="" method="POST" name="localSI">
+                <form onsubmit="return authenticateUser()" class="login" action="index.jsp" method="POST" name="localSI">
                     <h1 class="header">
                         Login to existing account...
                     </h1>
                     <hr class="break">
-                    <div class="loginError">
-                        <%= error %>
+                    <div class="loginError" id="badLogin">
+                        
                     </div>
                     <p class="item-text">
                         Username
@@ -137,16 +142,19 @@
 
             </div>
             <div class="col text">
-                <form onsubmit="return createNewUser()" class="login" action="" method="POST" name="localSU">
+                <form onsubmit="return createNewUser()" class="login" action="index.jsp" method="POST" name="localSU">
                     <h1 class="header">
                         Sign up for a new account!
                     </h1>
                     <hr class="break" width="100%">
+                    <div class="loginError" id="loginTaken"> 
+                    
+                    </div>
                     <p class="item-text">
                         Email
                     </p>
                     <input onfocus="removeError(this.id)" class="text-inpt" type="email" id="nsie" name="email">
-                    <div class="error" id="nsiee"><%=  emailTaken %></div>
+                    <div class="error" id="nsiee"></div>
                     <p class="item-text">
                         Username
                     </p>
@@ -166,7 +174,7 @@
                     <br>
                     <input onclick="removeError(this.id)" type="checkbox" id="natAndc" name="natAndc" value="true">
                     <label class="small-item-text" for="natAndc"> I have read and agree to all terms and conditions of
-                        OUR NAME</label>
+                        Braction</label>
                     <div id="natAndce"></div>
 
                     <br>

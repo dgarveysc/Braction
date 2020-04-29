@@ -70,19 +70,13 @@ public class brackedIdServlet extends HttpServlet {
 				System.out.println("User not in any games");
 			}
 			
+			connection.close();
+			st.close();
+			rs.close();
+			
 		} catch (SQLException | ClassNotFoundException sqle) {
 			System.out.println("Help" + sqle.getMessage());
-		} finally {
-			try {
-				connection.close();
-				st.close();
-				rs.close();
-			}
-			catch (SQLException sqle) {
-				System.out.println(sqle.getMessage());
-			}
-		}
-		
+		} 
 		int numGames = gameNameList.size();
 		request.setAttribute("numGames", numGames);
 		for(int i = 0; i < gameNameList.size(); i++)

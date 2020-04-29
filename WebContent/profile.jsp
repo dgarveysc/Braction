@@ -141,7 +141,15 @@
                                         </thead>
                                         <tbody>
                                             <% 
-                                                int numGames = (int)request.getAttribute("numGames");
+	                                            String games = (String)request.getParameter("numGames");
+	                                             
+	                                            if(games == null) 
+	                                            {
+	                                            	games = "0";
+	                                            }
+                                            
+                                            	int numGames = Integer.parseInt(games);
+                                                //int numGames = (int)request.getAttribute("numGames");
                                                 for(int i = 0; i < numGames; i++)
                                                 {
                                                     String bracketId = (String)request.getAttribute("gameName" + i);
@@ -240,10 +248,31 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td class="item-text" id="friend-username">csci201</td>
+                                                <%
+	                                            String friends = (String)request.getAttribute("numFriends");
+	                                            
+	                                            if(friends == null) 
+	                                            {
+	                                            	friends = "0";
+	                                            }
+	                                            
+	                                            int numFriends = Integer.parseInt(friends);
+	                                            for(int i = 0; i < numFriends; i++)
+                                                {
+                                                    String username = (String)request.getAttribute("username");
+													
+                                                    // shouldn't be null, but to make sure it doesn't break
+                                                    if(username == null) {
+                                                        username = "Friend ";
+                                                    }
+                                            	%>
+                                                    <td class="item-text" id="friend-username"><%= username %></td>
                                                     <td><a href="#" class="delete" id="delete-friend">Delete</a></td>
                                                     <td class="item-text">1234</td>
                                                 </tr>
+	                                            <%
+	                                                }
+	                                            %>
                                             </tbody>
                                         </table>
                                     </form>

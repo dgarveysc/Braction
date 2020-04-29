@@ -34,15 +34,16 @@ public class CreateTournament extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session =request.getSession(false);
+		HttpSession session =request.getSession();
 		int userID = -1;
 		int gameType = -1;
 		
 		boolean success = true;
 		String name = request.getParameter("tournamentName");
 		try {
-			userID = Integer.parseInt((String)session.getAttribute("userID"));
-			gameType = Integer.parseInt(request.getParameter("gameType"));
+			
+			userID = (Integer)session.getAttribute("userID");
+			gameType = Integer.parseInt(request.getParameter("gameType")); 
 		} catch (NumberFormatException | NullPointerException e) {
 			success = false;
 		}
