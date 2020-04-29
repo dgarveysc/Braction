@@ -11,8 +11,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import sql.JDBCBracketStuff;
-
 public class statsMethods extends Thread {
 
 	public int getUserToGameStatsID1() {
@@ -58,15 +56,18 @@ public class statsMethods extends Thread {
 		updateStats(userToGameStatsID1, round, won);
 	}
 
-	public boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2) {
-		if (JDBCBracketStuff.conn == null) {
-			JDBCBracketStuff.initConnection();
-		}
+	public static boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2) {
+		Connection conn = null;
+		Statement st = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		boolean success = false;
+
 		try {
-			ps = JDBCBracketStuff.conn.prepareStatement("INSERT INTO Opponents(userToGameStatsID1, userToGameStatsID2) VALUES (?,?)",
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
+			// get all statIDs corresponding to a user
+
+			ps = conn.prepareStatement("INSERT INTO Opponents(userToGameStatsID1, userToGameStatsID2) VALUES (?,?)",
 					Statement.RETURN_GENERATED_KEYS);
 
 			ps.setInt(1, userToGameStatsID1);
@@ -74,21 +75,18 @@ public class statsMethods extends Thread {
 
 			ps.executeUpdate();
 			rs = ps.getGeneratedKeys();
-			if (rs.next()) {
-				success = true;
-			}
+			return true;
 
 		} catch (SQLException se) {
 			System.out.println(se.getMessage());
+			return false;
 		}
-		return success;
 	}
 
-	public boolean updateStats(int userToGameStatsID, int round, boolean won) {
+	public static boolean updateStats(int userToGameStatsID, int round, boolean won) {
 		// take userToGameStatsID to get userID and statsID
-		if (JDBCBracketStuff.conn == null) {
-			JDBCBracketStuff.initConnection();
-		}
+
+		Connection conn = null;
 		Statement st = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -106,12 +104,12 @@ public class statsMethods extends Thread {
 		int loseStatsID = 0;
 		int loseCurElo = 0;
 		int loseEloChange = 0;
-		boolean success = false;
+
 		// get system date and time
 
 		try {
-			
-			st = JDBCBracketStuff.conn.createStatement();
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
+			st = conn.createStatement();
 
 			// get all statIDs corresponding to a user
 
@@ -129,7 +127,7 @@ public class statsMethods extends Thread {
 				loseUserID = rs.getInt("userID");
 				loseStatsID = rs.getInt("statsID");
 			}
-			rs.close();
+
 			// use opponents table to get opponent's userToGameStatsID to get their userID
 			// and statsID
 			rs = st.executeQuery("SELECT * FROM Opponents WHERE userToGameStatsID1 = " + userToGameStatsID
@@ -154,7 +152,7 @@ public class statsMethods extends Thread {
 			}
 
 			// use userToGameStatsID of other opponent to get their statsID and userID
-			rs.close();
+
 			if (won) {
 				rs = st.executeQuery("SELECT * FROM UserToGameStats WHERE userToGameStatsID= " + loseUserGameStatsID);
 				rs.next();
@@ -177,7 +175,7 @@ public class statsMethods extends Thread {
 			 */
 
 			// then look up both userID's to get each player's current rank
-			rs.close();
+
 			rs = st.executeQuery(
 					"SELECT userID, points FROM Users WHERE userID = " + winUserID + " OR userID = " + loseUserID);
 			while (rs.next()) {
@@ -226,29 +224,51 @@ public class statsMethods extends Thread {
 
 			st.executeUpdate(
 					"UPDATE Users " + "SET points = " + (loseEloChange + loseCurElo) + " WHERE UserID = " + loseUserID);
-			System.out.println("stats update done");
-			success = true;
+
+			return true;
 
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
+			return false;
 		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (ps != null) {
-					ps.close();
-				}
-				if (st != null) {
-					st.close();
-				}
-			} catch (SQLException sqle) {
-				System.out.println("sqle: " + sqle.getMessage());
-			}
+
 			// close stuff I guess
 		}
-		return success;
 	}
 
-	
-};;
+	public static int blankStatsRow() {
+
+		int statsID = 0;
+
+		Connection conn = null;
+		Statement st = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		// should count wins, losses, and upcoming!
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
+			st = conn.createStatement();
+
+			// get all statIDs corresponding to a user
+
+			ps = conn.prepareStatement("INSERT INTO Stats(won, bracketRound) VALUES (?,?)",
+					Statement.RETURN_GENERATED_KEYS);
+
+			ps.setNull(1, Types.NULL);
+			ps.setInt(2, 1);
+
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				statsID = rs.getInt(1);
+			}
+			return statsID;
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+		} finally {
+			return 0;
+		}
+	}
+}
