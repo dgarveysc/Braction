@@ -219,7 +219,7 @@ public class Profile extends HttpServlet {
 			eloChanges.sort(new EloComparator());
 
 
-			FileWriter fw = new FileWriter(userIDString + ".txt");
+			FileWriter fw = new FileWriter("src/Stats/" + userIDString + ".txt");
 			PrintWriter pw = new PrintWriter(fw);
 
 			int curElo = 1000;
@@ -261,7 +261,7 @@ public class Profile extends HttpServlet {
 			
 			
 			// now run Python script thru matPlotLib
-			ProcessBuilder pb = new ProcessBuilder("python", "plot.py", userIDString);
+			ProcessBuilder pb = new ProcessBuilder("python", "src/Stats/plot.py", userIDString);
 			Process p = pb.start();
 				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
 			// wait until done then continue with other stuff
