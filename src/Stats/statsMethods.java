@@ -1,4 +1,4 @@
-package testStats;
+package Stats;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,7 +11,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class StatsMethods {
+public class statsMethods {
 
 	
 	public static Boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2)

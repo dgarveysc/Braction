@@ -8,9 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import bracket.Bracket;
+import bracket.BracketOverview;
 import bracket.User;
 import bracket.UserToStats;
 
@@ -717,6 +720,101 @@ public class JDBCBracketStuff {
 		return success;
 	}
 	
+	
+	private static BracketOverview getBracketOverview(int bracketID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		BracketOverview b = null;
+		try {
+			StringBuilder sb = new StringBuilder("bracketS1");
+			for (int i = 2; i <= 15; i++) {
+				sb.append(String.format(", bracketS%d", i));
+			}
+			String query = String.format("SELECT bracketName, gameType, %s FROM Bracket WHERE bracketID=?", sb.toString());
+			System.out.printf("Executing query: %s\n", query);
+			ps = conn.prepareStatement(query);
+			ps.setString(1, Integer.toString(bracketID));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				String bracketName = rs.getString(1);
+				int gameType = Integer.parseInt(rs.getString(2));
+				String hostName = getUser(Integer.parseInt(rs.getString(10))).getName();
+				int vacantSpots = 8;
+				boolean done = rs.getString(3) != null;
+				for (int i = 8; i <= 15; i++) {
+					if (rs.getString(i+2) == null) {
+						vacantSpots--;
+					}
+				}
+				if (vacantSpots > 0) {
+					b = new BracketOverview(bracketName, bracketID, vacantSpots, hostName);
+				} else if (done) {
+					b = new BracketOverview(bracketName, bracketID, getUser(Integer.parseInt(rs.getString(3))).getName(), hostName);
+				} else {
+					b = new BracketOverview(bracketName, bracketID, hostName);
+				}
+				
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return b;
+	}
+	
+	public static List<Stack<BracketOverview>> getUserOverview(int userID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<Stack<BracketOverview>> tournaments = new LinkedList<>();
+		tournaments.add(new Stack<BracketOverview>());
+		tournaments.add(new Stack<BracketOverview>());
+		tournaments.add(new Stack<BracketOverview>());		
+		try {
+			ps = conn.prepareStatement("SELECT bracketID FROM UserToBracket WHERE userID=?");
+			ps.setString(1, Integer.toString(userID));
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				int bracketID = Integer.parseInt(rs.getString(1));
+				BracketOverview b = getBracketOverview(bracketID);
+				if (b != null) {
+					tournaments.get(b.getType()).push(b);
+				}
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return tournaments;
+	}
+	
+	
+	
 	public static void main(String[] args) {
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
@@ -732,6 +830,8 @@ public class JDBCBracketStuff {
 			System.out.printf("updated with result %b\n", result2);
 			System.out.println("bracket data:");
 			System.out.println(getBracket(b.getBracketID()));
+			System.out.println("Brakcet Overview");
+			System.out.println(getBracketOverview(b.getBracketID()));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
