@@ -213,7 +213,7 @@ public class Profile extends HttpServlet {
 				request.setAttribute("numPlayed", 0);
 				request.setAttribute("elo", 1000);
 				
-				//throw new Exception("No games played");
+				throw new Exception("No games played");
 				
 			}
 			System.out.println("Got here 2");
@@ -230,6 +230,8 @@ public class Profile extends HttpServlet {
 			//String stringPath = "/";
 			//String absolutePath = getServletContext().getRealPath(stringPath);
 			//System.out.println(absolutePath);
+			
+			
 			PrintWriter pw = new PrintWriter("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userIDString + ".txt");
 
 			int curElo = 1000;
@@ -268,12 +270,10 @@ public class Profile extends HttpServlet {
 			pw.flush();
 			System.out.println("Got here 4");
 
-			
-			
-			// now run Python script thru matPlotLib
+
 			ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\plot.py", userIDString);
 			Process p = pb.start();
-				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
+			// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
 			// wait until done then continue with other stuff
 			InputStream in = p.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -284,8 +284,11 @@ public class Profile extends HttpServlet {
 			if(!pyInput.contentEquals("Success"))  // figure out how to handle
 			{
 				System.out.println("PYTHON SCRIPT DID NOT WORK");
+				throw new Exception("script didn't work despite there being data");
 			}
 
+			// now run Python script thru matPlotLib
+			
 			System.out.println("Got here 5");
 
 			
@@ -487,6 +490,9 @@ public class Profile extends HttpServlet {
 			e.printStackTrace();
 		}
 		finally {
+			String nextJSP = "/profile.jsp";
+			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+			dispatcher.forward(request,response);
 			try {
 				if (rs != null) {
 					rs.close();
