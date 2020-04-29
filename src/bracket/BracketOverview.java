@@ -34,7 +34,7 @@ public class BracketOverview implements Serializable {
 	 * @param vacantSpots
 	 * @param id
 	 */
-	public BracketOverview(String name, int vacantSpots, int id, String hostName) {
+	public BracketOverview(String name, int id, int vacantSpots, String hostName) {
 		this.id = id;
 		this.name = name;
 		this.vacantSpots = vacantSpots;

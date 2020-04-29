@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack"%>
 <!Doctype HTML>
 <html>
     <head>
@@ -14,6 +14,10 @@
         <title>Braction Home</title>
 
         <style>
+        	html {
+	  			overflow-y: scroll;
+			}
+			
             .profile-header .main-wrapper{
                 padding-top: 12%;
                 width: 70%;
@@ -27,30 +31,6 @@
 
             .radio-text {
                 color: rgb(170, 193, 212);
-            }
-
-            #join-input {
-                width: 40%;
-                height: 50%;
-                background: hsl(225, 20%, 12%);
-            }
-
-            .join-content {
-                padding-top: 2%;
-                display: flex;
-            }
-            
-            #join-button {
-                vertical-align: baseline;
-                line-height: 1.1;
-                margin-left: 2%;
-            }
-
-            #add-button {
-                vertical-align: baseline;
-                line-height: 1.1;
-                margin-left: 5%;
-                width: 70%;
             }
 
             /*.add-friend-content {
@@ -79,22 +59,69 @@
 
     </head>
     <body>
+    <% 
+    	boolean loggedIn = false;
+    	if(session.getAttribute("userID") != null)
+    	{
+    		loggedIn = true;
+    		int userID = (Integer)session.getAttribute("userID");
+    		//int userIDInt = Integer.parseInt(userID);
+    	}
+    	
+    	
+    	
+        /*boolean loggedIn = false;
+        HttpSession s = request.getSession(false);
+        String profile = "";
+        String username = (String)s.getAttribute("username");
+        String home = "";
+        String login = "";
+        String logout = "";
+        // If the user is signed in, display home, favorites and logout
+        if(username != null){
+            home = "inline";
+            login = "none";
+            profile = "inline";
+            logout = "inline";
+        }else{
+            home = "inline";
+            login = "inline";
+            profile = "none";
+            logout = "none";
+        } */  
+        
+        %>
+    
+    <%
+	   /* boolean loggedIn = false;
+		HttpSession s = request.getSession();
+		String profile = "";
+		int userID = (int)s.getAttribute("userID");
+		String currentUser = (String)s.getAttribute("username");
+		if(currentUser != null){
+			profile = "<form method=\"GET\" action=\"brackedIdServlet\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"> <a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
+		}else{
+			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/login-sign-up.jsp");
+			dispatch.forward(request, response);
+		}*/
+    
+    %>
         <header class="profile-header">
                 <div class="logo">
-                    <a href="homepage.html">
+                    <a href="index.jsp">
                         <img src="logo.png" alt="logo">
                     </a>
                 </div> <!-- end logo -->
                 <div class="nav-area">
-				<a href="homepage.html">
+				<a href="index.jsp">
 					<input type="submit" class="button home-button" value="Home">
 				</a>
 				<a href="createTournament.jsp" >
 					<input type="submit" class="button create-button" value="Create Tournament">
 				</a>
-				<form method="GET" action="brackedIdServlet">
+				<form method="GET" action="Profile">
 				<!-- User ID -->
-					<input type="hidden" name="userID" value="1">
+					<!-- input type="hidden" name="userID" value="1"> -->
 					<a href="profile.jsp">
 						<input type="submit" class="button profile-button" value="Profile" id="active">
 					</a>
@@ -120,56 +147,40 @@
                         <div class="tab-pane fade show active" id="tournaments">
                             <div class="tournament-table">
                                 <div class="button-group">
-                                    <a href="create.html" class="btn btn-light">Create Tournament</a>
+                                    <a href="createTournament.jsp" class="btn btn-light">Create/Join Tournament</a>
                                 </div>
-                                <div class="join-content">
-                                    <input class="form-control" type="text" id="join-input" placeholder="Enter existing tournament code">
-                                    <button type="button" class="btn btn-light" id="join-button">Join</button>
-                                </div>
+                                <% 
+                                    	Object lists = request.getAttribute("userBrackets");
+                                    	if(lists != null)
+                                    	{
+                                    		List<Stack<BracketOverview>> stackList = (List<Stack<BracketOverview>>)lists;
+                                    		Stack<BracketOverview> pending = stackList.get(0);
+                                    		Stack<BracketOverview> active = stackList.get(1);
+                                    		Stack<BracketOverview> finished = stackList.get(2);
+                           		 %>
                                 <div class="table-content">
                                     <h4 class="mt-2">Active Tournaments</h4>
+                                    
+                                            		
                                     <form action="" method="post" name="activeform">
                                     <table>
                                         <thead>
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
-                                            <th class="table-heading" colspan="2">Action</th>
-                                            <th class="table-heading" colspan="2">Choose Winner</th>
-                                            <th class="table-heading"></th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            <% 
-	                                            String games = (String)request.getParameter("numGames");
-	                                             
-	                                            if(games == null) 
-	                                            {
-	                                            	games = "0";
-	                                            }
-                                            
-                                            	int numGames = Integer.parseInt(games);
-                                                //int numGames = (int)request.getAttribute("numGames");
-                                                for(int i = 0; i < numGames; i++)
-                                                {
-                                                    String bracketId = (String)request.getAttribute("gameName" + i);
-
-                                                    if(bracketId == null) {
-                                                        bracketId = "Bracket ";
-                                                    }
+                                           	<% 
+	                                               while(!active.isEmpty())
+	                                               {
+	                                                   BracketOverview nextBracket = active.pop();
+	                                                   String name = nextBracket.getName();
+	                                                   String hostName = nextBracket.getHostName();
                                             %>
                                         <tr>
-                                                <td class="item-text"><%= bracketId %></td>
-                                                <td class="item-text">user1234</td>
-                                                <td><a href="#" class="edit">Edit</a></td>
-                                                <td><a href="#" class="delete">Delete</a></td>
-                                                <td>
-                                                    <input type="radio" id="player1" name="choose-winner" value="player1">
-                                                    <label for="player1" class="radio-text">Player 1</label></td>
-                                                <td>
-                                                    <input type="radio" id="player2" name="choose-winner" value="player2">
-                                                    <label for="player2" class="radio-text">Player 2</label></td>
-                                                <td><button type="button" class="btn btn-light">Update</button></td>
+                                                <td class="item-text"><%= name %></td>
+                                                <td class="item-text"><%= hostName %></td>
                                         </tr>
                                             <%
                                                 }
@@ -185,18 +196,27 @@
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
-                                            <th class="table-heading" colspan="2">Action</th>
                                             <th class="table-heading">Vacant Spots</th>
                                         </tr>
                                         </thead>
                                         <tbody>
+                                        <%= pending.size() %>
+                                        	<% 
+                                               while(!pending.isEmpty())
+                                               {
+                                                   BracketOverview nextBracket = pending.pop();
+                                                   String name = nextBracket.getName();
+                                                   String hostName = nextBracket.getHostName();
+                                                   int vacantSpots = nextBracket.getVacantSpots();
+                                            %>
                                             <tr>
-                                                <td class="item-text">Tournament2</td>
-                                                <td class="item-text">user1234</td>
-                                                <td><a href="#" class="edit">Edit</a></td>
-                                                <td><a href="#" class="delete">Delete</a></td>
-                                                <td class="item-text">5</td>
+                                                <td class="item-text"><%= name %></td>
+                                                <td class="item-text"><%= hostName %></td>
+                                                <td class="item-text"><%= vacantSpots %></td>
                                             </tr>
+                                            <%
+                                                }
+                                            %>
                                         </tbody>
                                     </table>
                                 </form>
@@ -207,21 +227,32 @@
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
-                                            <th class="table-heading" colspan="2">Action</th>
-                                            <th class="table-heading">Vacant Spots</th>
+                                            <th class="table-heading">Winner</th>
                                          </tr>
                                         </thead>
                                         <tbody>
+                                        	<% 
+                                               while(!finished.isEmpty())
+                                               {
+                                                   BracketOverview nextBracket = finished.pop();
+                                                   String name = nextBracket.getName();
+                                                   String hostName = nextBracket.getHostName();
+                                                   String winner = nextBracket.getWinnerName();
+                                            %>
                                             <tr>
-                                                <td class="item-text">Tournament2</td>
-                                                <td class="item-text">user1234</td>
-                                                <td><a href="#" class="edit">Edit</a></td>
-                                                <td><a href="#" class="delete">Delete</a></td>
-                                                <td class="item-text">5</td>
+                                                <td class="item-text"><%= name %></td>
+                                                <td class="item-text"><%= hostName %></td>
+                                                <td class="item-text"><%= winner %></td>
                                             </tr>
+                                            <%
+                                                }
+                                            %>
                                         </tbody>
                                     </table>
                                 </form>
+                                <%
+                                	} // end if
+                                %>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="friends">
@@ -446,27 +477,6 @@
 								</div>*/
 									
 									%>
-                                <form action="" method="post" name="activeform">
-                                    <table>
-                                        <thead>
-                                        <tr>
-                                            <th class="table-heading">Tournament</th>
-                                            <th class="table-heading">Host</th>
-                                            <th class="table-heading" colspan="2">Action</th>
-                                            <th class="table-heading">Input Scores</th>
-                                         </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="item-text">Tournament1</td>
-                                                <td class="item-text">user1234</td>
-                                                <td><a href="#" class="edit">Edit</a></td>
-                                                <td><a href="#" class="delete">Delete</a></td>
-                                                <td><input type="text" name="input-score" size="5"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </form>
                             </div>
                         </div>
                     </div> <!--tab content div-->

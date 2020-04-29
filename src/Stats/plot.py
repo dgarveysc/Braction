@@ -7,7 +7,7 @@ import sys
 
 # get ID from command line and
 userID = sys.argv[1]
-file = open("C:\\Users\\arico\\eclipse-workspace\\testWeb\\src\\Stats\\" + userID + ".txt", "r")
+file = open("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userID + ".txt", "r")
 
 # process file, split it, then create boundaries
 yee = file.read()

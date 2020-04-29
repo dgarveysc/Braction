@@ -77,7 +77,7 @@
 		String profile = "";
 		String username = (String)s.getAttribute("username");
 		if(username != null){
-			profile = "<form method=\"GET\" action=\"brackedIdServlet\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
+			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
 		}else{
 			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/login-sign-up.jsp");
 			dispatch.forward(request, response);

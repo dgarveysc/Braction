@@ -58,12 +58,14 @@ public class Profile extends HttpServlet {
 		boolean success = true;
 		Object ui = session.getAttribute("userID");
 		String userid = null;
+		System.out.println("printing userid from session");
+		System.out.println((Integer)ui);
 		if (ui == null) {
 			success = false;
 		} else {
 			try {
-				userID = Integer.parseInt((String)ui);
-				userid = (String) ui;
+				userID = (Integer)ui;
+				userid = Integer.toString(userID);
 			} catch (NumberFormatException e) {
 				success = false;
 			}
@@ -206,7 +208,7 @@ public class Profile extends HttpServlet {
 				request.setAttribute("numPlayed", 0);
 				request.setAttribute("elo", 1000);
 				
-				throw new Exception("No games played");
+				//throw new Exception("No games played");
 				
 			}
 			System.out.println("Got here 2");
@@ -219,8 +221,11 @@ public class Profile extends HttpServlet {
 			eloChanges.sort(new EloComparator());
 
 
-			FileWriter fw = new FileWriter("src/Stats/" + userIDString + ".txt");
-			PrintWriter pw = new PrintWriter(fw);
+			//FileWriter fw = new FileWriter(userIDString + ".txt");
+			//String stringPath = "/";
+			//String absolutePath = getServletContext().getRealPath(stringPath);
+			//System.out.println(absolutePath);
+			PrintWriter pw = new PrintWriter("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userIDString + ".txt");
 
 			int curElo = 1000;
 
@@ -261,7 +266,7 @@ public class Profile extends HttpServlet {
 			
 			
 			// now run Python script thru matPlotLib
-			ProcessBuilder pb = new ProcessBuilder("python", "src/Stats/plot.py", userIDString);
+			ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\plot.py", userIDString);
 			Process p = pb.start();
 				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
 			// wait until done then continue with other stuff
@@ -472,10 +477,7 @@ public class Profile extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

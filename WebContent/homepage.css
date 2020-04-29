@@ -9,6 +9,11 @@
     margin: auto;
 }*/
 
+html {
+	overflow-y: scroll;
+}
+			
+
 .homepage-header {
     background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("computer-reduced.jpg");
     height: 100vh;

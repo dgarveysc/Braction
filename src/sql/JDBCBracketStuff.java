@@ -29,7 +29,7 @@ public class JDBCBracketStuff {
     private static final String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static SecureRandom random = new SecureRandom();
     
-    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=root";
+    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=okamoto928";
     
     public static void initConnection() {
 		if (conn != null) {
@@ -819,17 +819,19 @@ public class JDBCBracketStuff {
 			String query = String.format("SELECT bracketName, gameType, %s FROM Bracket WHERE bracketID=?", sb.toString());
 			System.out.printf("Executing query: %s\n", query);
 			ps = conn.prepareStatement(query);
+			System.out.println("BracketID: " + bracketID);
 			ps.setString(1, Integer.toString(bracketID));
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				String bracketName = rs.getString(1);
 				int gameType = Integer.parseInt(rs.getString(2));
-				String hostName = getUser(Integer.parseInt(rs.getString(10))).getName();
-				int vacantSpots = 8;
+				String hostName = getUserToStats(rs.getString(10)).getUser().getName();
+				int vacantSpots = 0;
 				boolean done = rs.getString(3) != null;
 				for (int i = 8; i <= 15; i++) {
-					if (rs.getString(i+2) == null) {
-						vacantSpots--;
+					String newString = rs.getString(i+2);
+					if (rs.wasNull()) {//.getString(i+2) == null) {
+						vacantSpots++;
 					}
 				}
 				if (vacantSpots > 0) {
@@ -876,7 +878,12 @@ public class JDBCBracketStuff {
 				int bracketID = Integer.parseInt(rs.getString(1));
 				BracketOverview b = getBracketOverview(bracketID);
 				if (b != null) {
+					System.out.println(b);
 					tournaments.get(b.getType()).push(b);
+				}
+				else
+				{
+					System.out.println("Bracket was null");
 				}
 			} 
 		} catch (SQLException sqle) {
@@ -893,6 +900,7 @@ public class JDBCBracketStuff {
 				System.out.println("sqle: " + sqle.getMessage());
 			}
 		}
+		System.out.println("Tournaments: " + tournaments.get(0).size());
 		return tournaments;
 	}
 	
