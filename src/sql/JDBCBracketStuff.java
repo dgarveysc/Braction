@@ -7,11 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import Stats.statsMethods;
 import bracket.Bracket;
 import bracket.BracketOverview;
 import bracket.User;
@@ -218,6 +220,51 @@ public class JDBCBracketStuff {
 			}
 		}
 		return success;
+	}
+	
+	public static int blankStatsRow() {
+		if (JDBCBracketStuff.conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		int statsID = 0;
+
+		Statement st = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		// should count wins, losses, and upcoming!
+		try {
+			// get all statIDs corresponding to a user
+
+			ps = JDBCBracketStuff.conn.prepareStatement("INSERT INTO Stats(won, bracketRound) VALUES (?,?)",
+					Statement.RETURN_GENERATED_KEYS);
+
+			ps.setNull(1, Types.NULL);
+			ps.setInt(2, 1);
+
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				statsID = rs.getInt(1);
+			}
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+				if (st != null) {
+					st.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return statsID;
 	}
 	
 	public static BracketIdCodePair createBracket(int userID, String bracketName, int gameType) {
@@ -428,7 +475,7 @@ public class JDBCBracketStuff {
 			if (rs.next()) {
 				String won = rs.getString(1);
 				if (won != null)
-					win = (won.equalsIgnoreCase("true")) ? 1 : 0;
+					win = (won.equalsIgnoreCase("1")) ? 1 : 0;
 			} 
 		} catch (SQLException sqle) {
 			System.out.println ("SQLException: " + sqle.getMessage());
@@ -674,9 +721,11 @@ public class JDBCBracketStuff {
 				
 				rs = ps.executeQuery();
 				int winnerID = -1; 
+				int uID1 = -1;
+				int uID2 = -1;
 				if (rs.next()) {
-					int uID1 = Integer.parseInt(rs.getString(1));
-					int uID2 = Integer.parseInt(rs.getString(2));
+					uID1 = Integer.parseInt(rs.getString(1));
+					uID2 = Integer.parseInt(rs.getString(2));
 					System.out.printf("Valid usersToStats found with ID %s and %s\n", uID1, uID2);
 					winnerID = (slot1Won) ? uID1 : uID2;
 				} else {
@@ -685,9 +734,6 @@ public class JDBCBracketStuff {
 				System.out.println("------");
 				rs.close();
 				ps.close();
-				
-				// CALL ADD OPPONENT
-				// CALL GENERAL STATS FUNCTION
 				
 				int round = (newSlot == 1) ? 3 : 2;
 				int userID = userIDofUserToStats(winnerID);
@@ -699,8 +745,15 @@ public class JDBCBracketStuff {
 					ps.setString(1, Integer.toString(userToStatsID));
 					ps.setString(2, Integer.toString(bracketID));
 					ps.executeUpdate();
-					success = true;
+					System.out.println("Running the stats Update");
+					if (userExists(uID1) && userExists(uID2)) {
+						statsMethods s = new statsMethods(uID1, slot1Won, uID2, round);
+						s.start();
+						success = true;
+					}
+					
 				}				
+				
 			}
 			
 		} catch (SQLException sqle) {
