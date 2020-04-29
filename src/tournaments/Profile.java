@@ -97,31 +97,40 @@ public class Profile extends HttpServlet {
 	}
 	
 	private void stats(HttpServletRequest request, String testID) {
-		Connection conn = null;
+		if (JDBCBracketStuff.conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
 		Statement st = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ResultSet rs2 = null;
 
 		Set<Integer> statIDs = null;
+		
+		Boolean noGames = false;
 
 		//should count wins, losses, and upcoming!
 
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
-			st = conn.createStatement();
+			
+			st = JDBCBracketStuff.conn.createStatement();
 
 			//get all statIDs corresponding to a user
-			rs = st.executeQuery("SELECT * FROM UserToBracket"
+			rs = st.executeQuery("SELECT * FROM UserToGameStats"
 					+ " WHERE userID = " + testID);
 
 			statIDs = new HashSet<Integer>();
 			while (rs.next()) { //now put all statIDs into vector
-
 				//ASSUME statID always exists
 				statIDs.add(rs.getInt("statsID"));
+				System.out.println("Adding statsID = " + rs.getInt("statsID"));
 			}
 			
+			if(statIDs.isEmpty())
+			{
+				noGames = true;
+			}
+				
 			
 			//get table of all statsID for user
 			rs2 = st.executeQuery("SELECT * FROM Stats"
@@ -138,6 +147,8 @@ public class Profile extends HttpServlet {
 			Double avgOppRank = 0.0;
 			Date gameDate = null;
 
+			System.out.println("Got here 1");
+			
 			//List of EloChanges
 			List<EloDate> eloChanges = new Vector<EloDate>();
 
@@ -155,6 +166,7 @@ public class Profile extends HttpServlet {
 
 				boolean won = rs2.getBoolean("won");
 				Integer oppRank = rs2.getInt("oppRank");
+				System.out.println("OppRank = " + oppRank);
 
 
 				if(won) //update wins and rank of opponents you beat
@@ -169,7 +181,7 @@ public class Profile extends HttpServlet {
 				numPlayed++;
 
 				//rounds span from 1-3, add total rounds
-				Integer round = rs2.getInt("round");
+				Integer round = rs2.getInt("bracketRound");
 				sumRounds += round;
 
 				if(round == 3 && won) //condition to check if won bracket
@@ -177,11 +189,6 @@ public class Profile extends HttpServlet {
 					numBWins++;
 				}
 
-				Integer prize = rs2.getInt("prize");
-				if(prize != null)
-				{
-					numEarned += prize;
-				}
 
 				Integer eloChange = rs2.getInt("xp");
 
@@ -194,6 +201,15 @@ public class Profile extends HttpServlet {
 				eloChanges.add(ed);
 
 			}
+			if(numPlayed == 0 || noGames) // NO GAMES PLAYED
+			{
+				request.setAttribute("numPlayed", 0);
+				request.setAttribute("elo", 1000);
+				
+				throw new Exception("No games played");
+				
+			}
+			System.out.println("Got here 2");
 
 			//VERIFY THAT THE USERS TESTID IS VALID, CATCH EXCEPTION
 			String userIDString = String.valueOf(testID);
@@ -212,12 +228,15 @@ public class Profile extends HttpServlet {
 			Vector<Integer> oppRkWins = new Vector<Integer>();
 			Vector<Integer> oppRkLosses = new Vector<Integer>();
 
+			System.out.println("Got here 3");
 
 			//now output list to file, of scores not changes or oppRank:
 			pw.print("1000\n");
 			for(int i = 0; i < eloChanges.size(); i++)
 			{
+				System.out.println("curElo printing is: " + curElo);
 				curElo += eloChanges.get(i).getElo();
+				System.out.println("after curElo printing is: " + curElo);
 				if(i == eloChanges.size()-1)
 				{
 					pw.print(curElo);
@@ -236,10 +255,13 @@ public class Profile extends HttpServlet {
 				}
 
 			}
+			pw.flush();
+			System.out.println("Got here 4");
 
-
+			
+			
 			// now run Python script thru matPlotLib
-			ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\arico\\Desktop\\test.py", userIDString);
+			ProcessBuilder pb = new ProcessBuilder("python", "plot.py", userIDString);
 			Process p = pb.start();
 				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
 			// wait until done then continue with other stuff
@@ -247,13 +269,16 @@ public class Profile extends HttpServlet {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
 			String pyInput = br.readLine(); //should buffer
+			System.out.println("PyInput is " + pyInput);
 
-			if(!pyInput.contentEquals("Sucess"))  // figure out how to handle
+			if(!pyInput.contentEquals("Success"))  // figure out how to handle
 			{
 				System.out.println("PYTHON SCRIPT DID NOT WORK");
 			}
 
+			System.out.println("Got here 5");
 
+			
 			// process data and output avg opp rank over winning games
 			Double wRank5 = 0.0;
 			Double wRank20 = 0.0;
@@ -402,6 +427,33 @@ public class Profile extends HttpServlet {
 			request.setAttribute("avgRound", avgRound);
 			request.setAttribute("numBWins", numBWins);
 			request.setAttribute("elo", curElo);
+			
+			// here System printing
+			System.out.println("numPlayed" + numPlayed);
+			System.out.println("numWins" + numWins);
+			System.out.println("numLosses" + numLosses);
+
+			System.out.println("avgOppW5" + wRank5);
+			System.out.println("avgOppW20" + wRank20);
+			System.out.println("avgOppWAll" + wRankAll);
+			
+			System.out.println("avgOppL5" + lRank5);
+			System.out.println("avgOppL20" + lRank20);
+			System.out.println("avgOppLAll" + lRankAll);
+
+			
+			System.out.println("win25" + win25);
+			System.out.println("win50" + win50);
+			System.out.println("win75" + win75);
+			System.out.println("lose25" + lose25);
+			System.out.println("lose50" + lose50);
+			System.out.println("lose75" + lose75);
+			
+			
+			System.out.println("avgOppRank" + avgOppRank);
+			System.out.println("avgRound" + avgRound);
+			System.out.println("numBWins" + numBWins);
+			System.out.println("elo" + curElo);
 
 
 			if(numPlayed != 0)
@@ -419,7 +471,15 @@ public class Profile extends HttpServlet {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
+		} 
+		catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
 			try {
 				if (rs != null) {
 					rs.close();
@@ -429,9 +489,6 @@ public class Profile extends HttpServlet {
 				}
 				if (ps != null) {
 					ps.close();
-				}
-				if (conn != null) {
-					conn.close();
 				}
 			} catch (SQLException sqle) {
 				System.out.println("sqle: " + sqle.getMessage());
