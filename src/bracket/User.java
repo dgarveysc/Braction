@@ -1,7 +1,13 @@
 package bracket;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6931930006220466624L;
 	private int userID;
 	private String name;
 	

@@ -1,7 +1,13 @@
 package bracket;
 
-public class UserToStats {
+import java.io.Serializable;
 
+public class UserToStats implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2310733488367263368L;
 	private User user;
 	private int won; // -1 if they haven't played, else 1 or 0
 	
