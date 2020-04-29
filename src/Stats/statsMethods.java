@@ -13,53 +13,47 @@ import java.util.Date;
 
 public class statsMethods extends Thread {
 
-	public String getType() {
-		return type;
+	public int getUserToGameStatsID1() {
+		return userToGameStatsID1;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setUserToGameStatsID1(int userToGameStatsID1) {
+		this.userToGameStatsID1 = userToGameStatsID1;
 	}
 
-	public int getParam1() {
-		return param1;
+	public int getUserToGameStatsID2() {
+		return userToGameStatsID2;
 	}
 
-	public void setParam1(int param1) {
-		this.param1 = param1;
+	public void setUserToGameStatsID2(int userToGameStatsID2) {
+		this.userToGameStatsID2 = userToGameStatsID2;
 	}
 
-	public int getParam2() {
-		return param2;
+	public int getRound() {
+		return round;
 	}
 
-	public void setParam2(int param2) {
-		this.param2 = param2;
+	public void setRound(int round) {
+		this.round = round;
 	}
 
-	public boolean isWon() {
-		return won;
-	}
-
-	public void setWon(boolean won) {
-		this.won = won;
-	}
-
-	private String type;
-	private int param1;
-	private int param2;
+	private int userToGameStatsID1;
+	private int userToGameStatsID2;
 	private boolean won;
+	private int round;
 
+	public statsMethods(int userToGameStatsID1, boolean won, int userToGameStatsID2, int round)
+	{
+		this.userToGameStatsID1 = userToGameStatsID1;
+		this.won = won;
+		this.userToGameStatsID2 = userToGameStatsID2;
+		this.round = round;
+	}
+	
 	public void run()
 	{
-		if (type.contentEquals("addOpponents"))
-		{
-			addOpponents(param1, param2);
-		}
-		else if(type.contentEquals("updateStats"))
-		{
-			updateStats(param1, param2, won);
-		}
+		addOpponents(userToGameStatsID1, userToGameStatsID2);
+		updateStats(userToGameStatsID1, round, won);
 	}
 
 	public static boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2) {
