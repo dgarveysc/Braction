@@ -82,6 +82,7 @@ public class Profile extends HttpServlet {
 		}
 		if (success) {
 			stats(request, userid);
+			getFriends(request, userID);
 			request.setAttribute("userBrackets", b);
 			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/profile.jsp");
 			dispatch.forward(request, response);
@@ -96,6 +97,10 @@ public class Profile extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+	
+	private void getFriends(HttpServletRequest r, int userID) {
+		r.setAttribute("friends", JDBCBracketStuff.getFriends(userID));
 	}
 	
 	private void stats(HttpServletRequest request, String testID) {

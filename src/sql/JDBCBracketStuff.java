@@ -11,8 +11,11 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
+import java.util.Vector;
 
+import Friends.Friend;
 import Stats.statsMethods;
 import bracket.Bracket;
 import bracket.BracketOverview;
@@ -904,7 +907,88 @@ public class JDBCBracketStuff {
 		return tournaments;
 	}
 	
+	private static Friend getFriend(int friendID, int status) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Friend u = null;
+		try {
+			ps = conn.prepareStatement("SELECT username, elo FROM Users WHERE userID=?");
+			ps.setString(1, Integer.toString(friendID));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				u = new Friend(friendID, rs.getString(1), rs.getInt(2), status);		
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return u;
+	}
 	
+	public static Vector<Queue<Friend>> getFriends(int userID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Vector<Queue<Friend>> friends = new Vector<>();
+		friends.add(new LinkedList<Friend>());
+		friends.add(new LinkedList<Friend>());
+		friends.add(new LinkedList<Friend>());		
+		try {
+			ps = conn.prepareStatement("SELECT userID2, acceptedStatus FROM friendID WHERE userID=?");
+			ps.setString(1, Integer.toString(userID));
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				int userID2 = rs.getInt(1);
+				int acceptedStatus = rs.getInt(2);
+				Friend f = getFriend(userID2, acceptedStatus);
+				if (f != null) {
+					System.out.println(f);
+					switch(f.getStatus()) {
+					case 2:
+						friends.get(2).add(f);
+						break;
+					case 10:
+						friends.get(1).add(f);
+					case 3:
+						friends.get(0).add(f);
+					}
+				}
+				else
+				{
+					System.out.println("Bracket was null");
+				}
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return friends;
+	}
 	
 	public static void main(String[] args) {
 		try {
