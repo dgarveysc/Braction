@@ -14,7 +14,7 @@ import java.util.Date;
 public class statsMethods {
 
 	
-	public static Boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2)
+	public static boolean addOpponents(int userToGameStatsID1, int userToGameStatsID2)
 	{
 		Connection conn = null;
 		Statement st = null;
@@ -44,7 +44,7 @@ public class statsMethods {
 
 	
 	
-	public static Boolean updateStats(int userToGameStatsID, int round, Boolean won)
+	public static boolean updateStats(int userToGameStatsID, int round, Boolean won)
 	{
 		//take userToGameStatsID to get userID and statsID
 		
@@ -244,10 +244,10 @@ public class statsMethods {
 
 			//get all statIDs corresponding to a user
 
-		    ps = conn.prepareStatement("INSERT INTO Stats(won, prize) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+		    ps = conn.prepareStatement("INSERT INTO Stats(won, bracketRound) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
 
 			ps.setNull(1, Types.NULL);
-			ps.setNull(2, Types.NULL);
+			ps.setInt(2, 1);
 
 			ps.executeUpdate();
 			rs = ps.getGeneratedKeys();
