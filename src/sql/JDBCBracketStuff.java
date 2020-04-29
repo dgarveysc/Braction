@@ -559,7 +559,7 @@ public class JDBCBracketStuff {
 				System.out.println("sqle: " + sqle.getMessage());
 			}
 		}
-		return u;
+		return elo;
 	}
 	
 	private static UserToStats getUserToStats(String userToStatsID) {

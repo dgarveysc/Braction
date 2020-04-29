@@ -49,7 +49,7 @@ public class StatsListerner extends HttpServlet {
 		}
 		int currElo = Integer.parseInt("currElo");
 		int newElo;
-		while ((newElo = JDBCBracketStuff.getEloOfUser(userID)) == currElo) {
+		while ((newElo = JDBCBracketStuff.getEloOfUser(userID)) == -1 || newElo == currElo) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
