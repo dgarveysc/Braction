@@ -21,6 +21,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class NewAccount
@@ -42,6 +43,7 @@ public class NewAccount extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//Getting parameters
+		int userID = -1;
 		String email = request.getParameter("email");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -81,25 +83,28 @@ public class NewAccount extends HttpServlet {
 			//Going through database
 			Connection connection = null;
 			PreparedStatement st = null;
+			PreparedStatement ps = null;
 			ResultSet rs = null;
+			ResultSet getUserID = null;
 			
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
-				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/hw4?user=root&password=root");
-				st = connection.prepareStatement("SELECT * FROM userinfo WHERE email=?");
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=root");
+				st = connection.prepareStatement("SELECT * FROM users WHERE email=? OR username=?");
 				st.setString(1, email);
+				st.setString(2, username);
 				rs = st.executeQuery();
 				if(rs.next()) {
 					//If username and email are already in the database, ask them to provide different ones
 					//request.setAttribute("signUpError", "\tEmail already taken, please sign up with a new one.");
-					out.println("Email already taken");
+					out.println("Email or username already taken");
 				}
 				else {
 					//Register user in the database and return a new page with favorites and logout
-					PreparedStatement newuser = connection.prepareStatement("INSERT INTO userinfo VALUES (?, ?, ?)");
-					newuser.setString(1, email);
-					newuser.setString(2, username);
-					newuser.setString(3, password);
+					PreparedStatement newuser = connection.prepareStatement("INSERT INTO Users (username, passphrase, email) VALUES (?, ?, ?)");
+					newuser.setString(3, email);
+					newuser.setString(1, username);
+					newuser.setString(2, password);
 					newuser.execute();
 					/**request.setAttribute("loggedIn", "true");
 					request.setAttribute("username", username);
@@ -110,6 +115,18 @@ public class NewAccount extends HttpServlet {
 						System.out.println(sqle.getMessage());
 					}
 					
+					//Getting the userID
+					ps = connection.prepareStatement("SELECT userID FROM users WHERE username=?");
+					ps.setString(1, username);
+					getUserID = ps.executeQuery();
+					if(getUserID.next()) {
+						userID = getUserID.getInt("userID");
+					}
+					
+					//Setting session userID
+					System.out.println("userID: " + userID);
+					HttpSession userSession = request.getSession();
+                    userSession.setAttribute("userID", userID);
 					//Sending confirmation email 
 					//Initializing variables
 				    String bractionEmail = "bractionsportswebsite@gmail.com";  
@@ -172,8 +189,10 @@ public class NewAccount extends HttpServlet {
 			} finally {
 				try {
 					connection.close();
+					ps.close();
 					st.close();
 					rs.close();
+					getUserID.close();
 				} catch (SQLException sqle2) {
 					System.out.println(sqle2.getMessage());
 				}
