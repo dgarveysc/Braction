@@ -36,9 +36,9 @@
                 async: false,
                 //Making the tournament ID code show up on screen
                 success: function(result){
-                	if(result[0] === "<")
+                	if(result === "False")
                 	{
-                		$( "#badLogin" ).html(result);
+                		$( "#badLogin" ).text("Incorrect combination of username and password. Please try again.");
                 		success = false;
                 	}
                 }
@@ -51,6 +51,8 @@
             if (v == false) {
                 return false;
             }
+            
+            var success = true;
             // Using jQuery 
             $.ajax({
                 url: 'NewAccount',
@@ -61,11 +63,16 @@
                     cpword: document.localSU.confirmPass.value,
                     natAndc: document.localSU.natAndc.value
                 },
+                async: false,
                 success: function(result){
-                	$( "#loginTaken").html(result);
+                	if(result[0] === "<") // change to "False"
+                	{
+                		$( "#loginTaken").text("Email already taken. Please try again.");
+                		success = false;
+                	}
                 }
             });
-            return false;
+            return success;
 
         }
 

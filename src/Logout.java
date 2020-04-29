@@ -16,7 +16,7 @@ public class Logout extends HttpServlet {
        
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String next = request.getParameter("toUrl"); System.out.println(next);
+		String next = "index.jsp";//request.getParameter("toUrl"); System.out.println(next);
 		// Invalidate the current session
 		HttpSession s = request.getSession();
 		
@@ -25,8 +25,8 @@ public class Logout extends HttpServlet {
 		
 		
 		// Return the user to the home page
-		RequestDispatcher dispatch = getServletContext().getRequestDispatcher(next);
-		dispatch.forward(request, response);
+		/*RequestDispatcher dispatch = getServletContext().getRequestDispatcher(next);
+		dispatch.forward(request, response);*/
 	}
 
 	

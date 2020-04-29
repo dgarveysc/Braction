@@ -156,7 +156,7 @@ public class NewAccount extends HttpServlet {
 
 				      out.println("Account created!");
 				
-			} }
+			} } // try
 				catch (SQLException sqle) {
 				System.out.println(sqle.getMessage());
 			} /*catch (ClassNotFoundException e) {
@@ -169,17 +169,32 @@ public class NewAccount extends HttpServlet {
 			finally { 
 			
 				try {
-					connection.close();
-					ps.close();
-					st.close();
-					rs.close();
-					getUserID.close();
+					if(getUserID != null)
+					{
+						getUserID.close();
+					}
+					if(rs != null)
+					{
+						rs.close();
+					}
+					if(ps != null)
+					{
+						ps.close();
+					}
+					if(st != null)
+					{
+						st.close();
+					}
+					if(connection != null)
+					{
+						connection.close();
+					}
 				} catch (SQLException sqle2) {
 					System.out.println(sqle2.getMessage());
 				}
 			
 			}
-		} // TRY BLOCK
+		} 
 			else
 			{
 				

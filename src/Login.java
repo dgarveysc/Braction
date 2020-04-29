@@ -53,7 +53,7 @@ public class Login extends HttpServlet {
 					}
 					else {
 						System.out.println("b");
-						out.println("False");
+						out.print("False");
 						//If username and password aren't in database, throw an error
 						//request.setAttribute("loginError", "Username and password combination is not registered.");
 						//next = "/login-sign-up.jsp";
