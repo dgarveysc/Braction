@@ -32,7 +32,7 @@ public class JDBCBracketStuff {
     private static final String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static SecureRandom random = new SecureRandom();
     
-    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=okamoto928";
+    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=root";
     
     public static void initConnection() {
 		if (conn != null) {
@@ -990,6 +990,151 @@ public class JDBCBracketStuff {
 		return friends;
 	}
 	
+	/**
+	 * 
+	 * @param uID1
+	 * @param uID2
+	 * @return 1 if is friend, 0 if not, -1 if fail
+	 */
+	public static int isFriend(int uID1, int uID2) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Friend u = null;
+		int result = -1;
+		try {
+			ps = conn.prepareStatement("SELECT friendID FROM Friends WHERE userID1=? AND userID2=? AND acceptedStatus=2");
+			ps.setString(1, Integer.toString(uID1));
+			ps.setString(2, Integer.toString(uID2));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				result = 1;
+				System.out.println("friends");
+			} else {
+				System.out.println("not friends");
+				result = 0;
+			}
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		if (result == -1)
+				System.out.println("checking if they are friends failed");
+		return result;
+	}
+	
+	private static boolean validateFriendRequest(int uid1, int uid2) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean success = false;
+		try {
+			ps = conn.prepareStatement("SELECT friendID FROM Friends WHERE (userID1=? AND userID2=?) OR (userID1=? AND userID2=?)");
+			ps.setString(1, Integer.toString(uid1));
+			ps.setString(2, Integer.toString(uid2));
+			ps.setString(3, Integer.toString(uid2));
+			ps.setString(4, Integer.toString(uid1));
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				int friendID = rs.getInt(1);
+				ps = conn.prepareStatement("UPDATE Friends Set acceptedStatus=2 WHERE friendID=?");
+				ps.setString(1, Integer.toString(friendID));
+				ps.executeUpdate();
+			}
+			success = true;
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return success;
+	}
+	
+	/**
+	 * 
+	 * @param requestID
+	 * @param receiveID
+	 * @return -1 is failed, 0 is user does not exist, 1 is friend already exists, 2 is waiting on receive, 3 is success
+	 */
+	public static int addFriend(int requestID, int receiveID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		if (!userExists(receiveID)) {
+			return 0;
+		} else if (isFriend(requestID, receiveID) == 1) {
+			return 1;
+		}
+		int result = -1;
+		try {
+			System.out.println("adding stats");
+			ps = conn.prepareStatement("SELECT friendID, acceptedStatus FROM Friends WHERE userID1=? AND userID2=?");
+			ps.setString(1, Integer.toString(requestID));
+			ps.setString(2, Integer.toString(receiveID));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				System.out.println("something found");
+				int friendID = rs.getInt(1);
+				int acceptedStatus = rs.getInt(2);
+				if (acceptedStatus == 10) {
+					result = 2;
+				} else if (acceptedStatus == 3) {
+					validateFriendRequest(requestID, receiveID);
+					result = 3;
+				}
+			} else {
+				ps.close();
+				ps = conn.prepareStatement("INSERT INTO Friends (userID1, userID2, acceptedStatus) VALUES (?,?, 10) , (?,?,3)");
+				ps.setString(1, Integer.toString(requestID));
+				ps.setString(2, Integer.toString(receiveID));
+				ps.setString(3, Integer.toString(receiveID));
+				ps.setString(4, Integer.toString(requestID));
+				ps.executeUpdate();
+				System.out.println("added firend for first time");
+				result = 2;
+			}
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return result;
+	}
+	
 	public static void main(String[] args) {
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
@@ -1007,6 +1152,7 @@ public class JDBCBracketStuff {
 			System.out.println(getBracket(b.getBracketID()));
 			System.out.println("Brakcet Overview");
 			System.out.println(getBracketOverview(b.getBracketID()));
+			System.out.println(addFriend(1, 2));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
