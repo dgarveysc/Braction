@@ -21,6 +21,15 @@
 	background: #ffffff;
 }
 
+.link{
+	text-decoration: none;
+	color: white;
+}
+
+.link:hover{
+	text-decoration: none;
+}
+
 /*Nav Bar*/
 .button {
 	background-color: #000000;

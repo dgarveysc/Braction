@@ -56,7 +56,7 @@
                 },
                 success: function (result) {
                 	if(result[0] != 'A' && result[0] != 'Y'){
-                		$("#tCOdee").html("<div> Success! Please navigate to your <a href=\"profile.jsp\"> profile page </a> to view the tournament! </div>");
+                		$("#tCOdee").html("<div> Success! Please navigate to your <a class=\"link\" href=\"profile.jsp\"> profile page </a> to view the tournament! </div>");
                 	}else{
                         $("#tCOdee").html("<div>" + result + " Please try a different code. </div>");
                 	}
@@ -77,7 +77,7 @@
 		String profile = "";
 		String username = (String)s.getAttribute("username");
 		if(username != null){
-			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
+			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button link\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
 		}else{
 			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/login-sign-up.jsp");
 			dispatch.forward(request, response);
@@ -92,7 +92,7 @@
             <div class="col">
 
                 <div class="logo">
-                    <a href="homepage.html">
+                    <a href="index.jsp">
                         <img src="logo.png" alt="logo">
                     </a>
                 </div>

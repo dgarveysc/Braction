@@ -18,8 +18,8 @@
 		}
 		String profile = "";
 		if(loggedIn){
-			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"createTournament.jsp\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
-			
+			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"createTournament.jsp\" id=\"createTButton\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
+
 		}else{
 			profile = "<a href=\"createTournament.jsp\" ><input type=\"submit\" class=\"button create-button\" value=\"Create Tournament\"></a><a href=\"login-sign-up.jsp\"><input type=\"submit\" class=\"button login-button\" value=\"Login/Sign Up\"></a>";
 
