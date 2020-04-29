@@ -48,11 +48,13 @@ public class AddFriend extends HttpServlet {
 				success = false;
 			}
 		}
-		
+		int result = -1;
 		if (success) {
 			String friendUsername = request.getParameter("usernameToAdd");
-			int result = JDBCBracketStuff.addFriend(userID, friendUsername);
+			result = JDBCBracketStuff.addFriend(userID, friendUsername);
 		}
+		PrintWriter out = response.getWriter();
+		out.print(result);
 	}
 
 	/**
