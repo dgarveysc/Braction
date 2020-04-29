@@ -960,12 +960,12 @@ public class JDBCBracketStuff {
 					System.out.println(f);
 					switch(f.getStatus()) {
 					case 2:
-						friends.get(2).add(f);
+						friends.get(2).add(f); // are friends
 						break;
 					case 10:
-						friends.get(1).add(f);
+						friends.get(1).add(f); // pending friends rq
 					case 3:
-						friends.get(0).add(f);
+						friends.get(0).add(f); // received friend rq
 					}
 				}
 				else
@@ -1073,19 +1073,56 @@ public class JDBCBracketStuff {
 		return success;
 	}
 	
+	private static int getUserID(String username) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int userID= -1;
+		try {
+			System.out.println("adding stats");
+			ps = conn.prepareStatement("SELECT userID FROM Users WHERE userID=?");
+			ps.setString(1, username);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				userID = rs.getInt(1);
+				if (rs.wasNull()) {
+					userID = -1;
+				}
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return userID;
+	}
+	
 	/**
 	 * 
 	 * @param requestID
 	 * @param receiveID
 	 * @return -1 is failed, 0 is user does not exist, 1 is friend already exists, 2 is waiting on receive, 3 is success
 	 */
-	public static int addFriend(int requestID, int receiveID) {
+	public static int addFriend(int requestID, String friendName) {
 		if (conn == null) {
 			JDBCBracketStuff.initConnection();
 		}
+		int receiveID = getUserID(friendName);
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		if (!userExists(receiveID)) {
+		if (receiveID == -1) {
 			return 0;
 		} else if (isFriend(requestID, receiveID) == 1) {
 			return 1;
@@ -1152,7 +1189,6 @@ public class JDBCBracketStuff {
 			System.out.println(getBracket(b.getBracketID()));
 			System.out.println("Brakcet Overview");
 			System.out.println(getBracketOverview(b.getBracketID()));
-			System.out.println(addFriend(1, 2));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
