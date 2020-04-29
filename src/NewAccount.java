@@ -5,7 +5,15 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,12 +22,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 @WebServlet("/NewAccount")
 public class NewAccount extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//Getting parameters
+		int userID = -1;
 		String email = request.getParameter("email");
 		String username = request.getParameter("uname");
 		String password = request.getParameter("pword");
@@ -47,13 +56,16 @@ public class NewAccount extends HttpServlet {
 			//Going through database
 			Connection connection = null;
 			PreparedStatement st = null;
+			PreparedStatement ps = null;
 			ResultSet rs = null;
+			ResultSet getUserID = null;
 			
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
-				connection = DriverManager.getConnection("jdbc:mysql://localhost/sportswebsite?user=root&password=okamoto928");
-				st = connection.prepareStatement("SELECT * FROM Users WHERE email=?");
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=root");
+				st = connection.prepareStatement("SELECT * FROM users WHERE email=? OR username=?");
 				st.setString(1, email);
+				st.setString(2, username);
 				rs = st.executeQuery();
 				if(rs.next()) {
 					//If username and email are already in the database, ask them to provide different ones
@@ -75,35 +87,105 @@ public class NewAccount extends HttpServlet {
                         
 					request.setAttribute("username", username);
 					//Send dispatch
-					RequestDispatcher dispatch = getServletContext().getRequestDispatcher(next);
-					dispatch.forward(request, response);
+					//RequestDispatcher dispatch = getServletContext().getRequestDispatcher(next);
+					//dispatch.forward(request, response);
 					try {
 						newuser.close();
 					} catch (SQLException sqle) {
 						System.out.println(sqle.getMessage());
-                    }
-				}
+					}
+					
+					//Getting the userID
+					ps = connection.prepareStatement("SELECT userID FROM users WHERE username=?");
+					ps.setString(1, username);
+					getUserID = ps.executeQuery();
+					if(getUserID.next()) {
+						userID = getUserID.getInt("userID");
+					}
+					
+					//Setting session userID
+					System.out.println("userID: " + userID);
+					HttpSession userSession = request.getSession();
+                    userSession.setAttribute("userID", userID);
+					//Sending confirmation email 
+					//Initializing variables
+				    String bractionEmail = "bractionsportswebsite@gmail.com";  
+				    String bractionPass = "sportswebsite"; 
+				    String recipientAddress = email;
+
+			        //Setting properties
+			        Properties properties = System.getProperties();
+			        String sender = bractionEmail;
+			        String pass = bractionPass;
+			        String host = "smtp.gmail.com";
+			        properties.put("mail.smtp.starttls.enable", "true");
+			        properties.put("mail.smtp.host", host);
+			        properties.put("mail.smtp.user", sender);
+			        properties.put("mail.smtp.password", pass);
+			        properties.put("mail.smtp.port", "587");
+			        properties.put("mail.smtp.auth", "true");
+
+			        //Creating the message and session
+			        Session session2 = Session.getDefaultInstance(properties);
+			        MimeMessage message = new MimeMessage(Session.getDefaultInstance(properties));
+
+			        try {
+			            message.setFrom(new InternetAddress(sender));
+			            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientAddress));
+			            
+			            //Subject line
+				        String subject = "Welcome to Braction!";
+			            message.setSubject(subject);
+			            
+			            //Writing the body of the email
+				        String body = "Thank you for registering for Braction! \nHere's your username: \"" + username + "\" and password: \"" + password + "\"";
+			            message.setText(body);
+			            
+			            //Creating transport
+			            Transport transport = session2.getTransport("smtp");
+			            transport.connect(host, sender, pass);
+			            transport.sendMessage(message, message.getAllRecipients());
+			            transport.close();
+			        }
+			        catch (AddressException ae) {
+			            ae.printStackTrace();
+			        }
+			        catch (MessagingException me) {
+			            me.printStackTrace();
+			        }
+
+				      out.println("Account created!");
 				
-				
-			} catch (SQLException sqle) {
+			} }
+				catch (SQLException sqle) {
 				System.out.println(sqle.getMessage());
 			} /*catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}*/ catch (Exception e ){
 				e.printStackTrace();
-			}/*finally { {
+			}
+			
+			finally { 
 			
 				try {
 					connection.close();
+					ps.close();
 					st.close();
 					rs.close();
+					getUserID.close();
 				} catch (SQLException sqle2) {
 					System.out.println(sqle2.getMessage());
-				}*/
-			}
+				}
 			
-		}
+			}
+		} // TRY BLOCK
+			else
+			{
+				
+			
+	}// IF STATEMENT
+	} // METHOD
 	
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

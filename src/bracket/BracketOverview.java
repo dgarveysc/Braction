@@ -1,7 +1,13 @@
 package bracket;
 
-public class BracketOverview {
+import java.io.Serializable;
+
+public class BracketOverview implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5271141676274380052L;
 	private int type;
 	private String name;
 	private int vacantSpots;

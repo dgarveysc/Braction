@@ -720,6 +720,36 @@ public class JDBCBracketStuff {
 		return success;
 	}
 	
+	public static boolean isHost(int bracketID, int userID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean isHost = false;
+		try {
+			ps = conn.prepareStatement("SELECT bracketS8 FROM Bracket WHERE bracketID=?");
+			ps.setString(1, Integer.toString(bracketID));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				isHost = (userID == userIDofUserToStats(Integer.parseInt(rs.getString(1))));				
+			}
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return isHost;
+	}
 	
 	private static BracketOverview getBracketOverview(int bracketID) {
 		if (conn == null) {

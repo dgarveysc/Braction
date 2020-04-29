@@ -1,9 +1,14 @@
 package bracket;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Bracket {
+public class Bracket implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7549979834124900226L;
 	private List<UserToStats> bracket;
 	
 	public Bracket(List<UserToStats> b) {
