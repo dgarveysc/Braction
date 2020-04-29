@@ -62,15 +62,24 @@ public class NewAccount extends HttpServlet {
 			
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
-				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=okamoto928");
-				st = connection.prepareStatement("SELECT * FROM users WHERE email=? OR username=?");
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=root");
+				st = connection.prepareStatement("SELECT * FROM users WHERE email=?");
 				st.setString(1, email);
-				st.setString(2, username);
 				rs = st.executeQuery();
 				if(rs.next()) {
-					//If username and email are already in the database, ask them to provide different ones
-					out.println( "<div>Email already taken, please sign up with a new one.</div>");
-					System.out.println("Already taken");
+					//If email is already in the database, ask them to provide different ones
+					out.print( "Email");
+					System.out.println("Email already taken");
+					return;
+				}
+				// Check if the username is in the database
+				st = connection.prepareStatement("SELECT * FROM users WHERE username=?");
+				st.setString(1, username);
+				rs = st.executeQuery();
+				if(rs.next()) {
+					out.print("Username");
+					System.out.println("Username already taken");
+					return;
 				}
 				else {
 					//Register user in the database and return a new page with favorites and logout
@@ -154,7 +163,7 @@ public class NewAccount extends HttpServlet {
 			            me.printStackTrace();
 			        }
 
-				      out.println("Account created!");
+				    out.print("True");
 				
 			} } // try
 				catch (SQLException sqle) {

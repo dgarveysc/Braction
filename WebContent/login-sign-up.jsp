@@ -65,9 +65,13 @@
                 },
                 async: false,
                 success: function(result){
-                	if(result[0] === "<") // change to "False"
+                	if(result == "Email") 
                 	{
                 		$( "#loginTaken").text("Email already taken. Please try again.");
+                		success = false;
+                	}
+                	else if(result == "Username"){
+                		$( "#loginTaken").text("Username already taken. Please try again.");
                 		success = false;
                 	}
                 }
