@@ -10,21 +10,38 @@
 	</head>
 <body>
 	<% 
-		boolean loggedIn = false;
-		HttpSession s = request.getSession();
-		String username = (String)s.getAttribute("username");
-		if(username != null){
-			loggedIn = true;
-		}
-		String profile = "";
-		if(loggedIn){
-			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"createTournament.jsp\" id=\"createTButton\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
+    	boolean loggedIn = false;
+    	if(session.getAttribute("userID") != null)
+    	{
+    		loggedIn = true;
+    		int userID = (Integer)session.getAttribute("userID");
+    		//int userIDInt = Integer.parseInt(userID);
+    	}
 
-		}else{
-			profile = "<a href=\"createTournament.jsp\" ><input type=\"submit\" class=\"button create-button\" value=\"Create Tournament\"></a><a href=\"login-sign-up.jsp\"><input type=\"submit\" class=\"button login-button\" value=\"Login/Sign Up\"></a>";
-
-		}
-	%>
+        //boolean loggedIn = false;
+        HttpSession s = request.getSession(false);
+        String profile = "";
+        String createTournament = "";
+        String currentUser = (String)s.getAttribute("username");
+        String home = "";
+        String login = "";
+        String logout = "";
+        // If the user is signed in, display home, favorites and logout
+        if(currentUser != null){
+            home = "inline";
+            createTournament = "inline";
+            login = "none";
+            profile = "inline";
+            logout = "inline";
+        }else{
+            home = "inline";
+            createTournament = "inline";
+            login = "inline";
+            profile = "none";
+            logout = "none";
+        } 
+        
+        %>
 	<header class="homepage-header">
 		<div class="wrapper">
         	<div class="logo">
@@ -33,13 +50,26 @@
 				</a>
 			</div>
 			<div class="nav-area">
-				<a href="#">
-						<input type="submit" class="button home-button" value="Home" id="active">
+				<a href="index.jsp" style="display: <%=home %>">
+					<input type="submit" class="button home-button" value="Home" id="active">
 				</a>
-				<div>
-					<%= profile %>
+				<a href="createTournament.jsp" style="display: <%= createTournament %>" >
+					<input type="submit" class="button create-button" value="Create Tournament">
+				</a>
+				<form method="GET" action="Profile">
+				<!-- User ID -->
+					<!-- input type="hidden" name="userID" value="1"> -->
+					<a href="profile.jsp" style="display: <%= profile %>">
+						<input type="submit" class="button profile-button" value="Profile">
+					</a>
+				</form>
+				<a href="login-sign-up.jsp" style="display: <%= login %>">
+					<input type="submit" class="button login-button" value="Login/Sign Up">
+				</a>
+				<a href="index.jsp">
+                    <input type="submit" style="display: <%= logout %>" class="button logout-button" value="Logout" onclick="logout()">
+                </a>
 				</div>
-			</div>
 		</div>	
 		<div class="welcome-text">
 			<h1>Bringing the competition to you.</h1>

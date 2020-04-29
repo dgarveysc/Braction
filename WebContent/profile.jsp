@@ -10,6 +10,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="myScript.js"></script>
 
         <title>Braction Home</title>
 
@@ -67,45 +68,32 @@
     		int userID = (Integer)session.getAttribute("userID");
     		//int userIDInt = Integer.parseInt(userID);
     	}
-    	
-    	
-    	
-        /*boolean loggedIn = false;
+
+        //boolean loggedIn = false;
         HttpSession s = request.getSession(false);
         String profile = "";
-        String username = (String)s.getAttribute("username");
+        String createTournament = "";
+        String currentUser = (String)s.getAttribute("username");
         String home = "";
         String login = "";
         String logout = "";
         // If the user is signed in, display home, favorites and logout
-        if(username != null){
+        if(currentUser != null){
             home = "inline";
+            createTournament = "inline";
             login = "none";
             profile = "inline";
             logout = "inline";
         }else{
             home = "inline";
+            createTournament = "inline";
             login = "inline";
             profile = "none";
             logout = "none";
-        } */  
+        } 
         
         %>
-    
-    <%
-	   /* boolean loggedIn = false;
-		HttpSession s = request.getSession();
-		String profile = "";
-		int userID = (int)s.getAttribute("userID");
-		String currentUser = (String)s.getAttribute("username");
-		if(currentUser != null){
-			profile = "<form method=\"GET\" action=\"brackedIdServlet\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"> <a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
-		}else{
-			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/login-sign-up.jsp");
-			dispatch.forward(request, response);
-		}*/
-    
-    %>
+ 
         <header class="profile-header">
                 <div class="logo">
                     <a href="index.jsp">
@@ -113,22 +101,25 @@
                     </a>
                 </div> <!-- end logo -->
                 <div class="nav-area">
-				<a href="index.jsp">
+				<a href="index.jsp" style="display: <%=home %>">
 					<input type="submit" class="button home-button" value="Home">
 				</a>
-				<a href="createTournament.jsp" >
+				<a href="createTournament.jsp" style="display: <%= createTournament %>" >
 					<input type="submit" class="button create-button" value="Create Tournament">
 				</a>
 				<form method="GET" action="Profile">
 				<!-- User ID -->
 					<!-- input type="hidden" name="userID" value="1"> -->
-					<a href="profile.jsp">
+					<a href="profile.jsp" style="display: <%= profile %>">
 						<input type="submit" class="button profile-button" value="Profile" id="active">
 					</a>
 				</form>
-				<a href="login-sign-up.jsp">
+				<a href="login-sign-up.jsp" style="display: <%= login %>">
 					<input type="submit" class="button login-button" value="Login/Sign Up">
 				</a>
+				<a href="index.jsp">
+                    <input type="submit" style="display: <%= logout %>" class="button logout-button" value="Logout" onclick="logout()">
+                </a>
 				</div>
             	<!--Tabs-->
                 <div class="main-wrapper">
