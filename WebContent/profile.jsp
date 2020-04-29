@@ -81,12 +81,12 @@
     <body>
         <header class="profile-header">
                 <div class="logo">
-                    <a href="homepage.html">
+                    <a href="index.jsp">
                         <img src="logo.png" alt="logo">
                     </a>
                 </div> <!-- end logo -->
                 <div class="nav-area">
-				<a href="homepage.html">
+				<a href="index.jsp">
 					<input type="submit" class="button home-button" value="Home">
 				</a>
 				<a href="createTournament.jsp" >

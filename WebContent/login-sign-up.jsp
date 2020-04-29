@@ -100,7 +100,7 @@
             <div class="col">
 
                 <div class="logo">
-                    <a href="homepage.html">
+                    <a href="index.jsp">
                         <img src="logo.png" alt="logo">
                     </a>
                 </div>
