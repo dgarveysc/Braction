@@ -33,6 +33,14 @@ input [type=button]{
 
 }
 
+#code {
+	color: #c6e3ff;
+	font-family: Helvetica, sans-serif;
+	margin-left: 40%;
+	margin-top: 1%;
+
+}
+
 #bracketName {
 	color: #ffffff;
 	font-family: Helvetica, sans-serif;
