@@ -874,7 +874,7 @@ public class JDBCBracketStuff {
 				if (vacantSpots > 0) {
 					b = new BracketOverview(bracketName, bracketID, vacantSpots, hostName);
 				} else if (done) {
-					b = new BracketOverview(bracketName, bracketID, getUser(Integer.parseInt(rs.getString(3))).getName(), hostName);
+					b = new BracketOverview(bracketName, bracketID, getUserToStats(rs.getString(3)).getUser().getName(), hostName);
 				} else {
 					b = new BracketOverview(bracketName, bracketID, hostName);
 				}
