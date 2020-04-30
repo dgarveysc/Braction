@@ -841,7 +841,7 @@ public class JDBCBracketStuff {
 		return isHost;
 	}
 	
-	private static BracketOverview getBracketOverview(int bracketID) {
+	public static BracketOverview getBracketOverview(int bracketID) {
 		if (conn == null) {
 			JDBCBracketStuff.initConnection();
 		}

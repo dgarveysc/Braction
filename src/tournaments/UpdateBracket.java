@@ -34,6 +34,7 @@ public class UpdateBracket extends HttpServlet {
 		String slot2 = request.getParameter("slot2");
 		String bracketID1 = request.getParameter("bracketID");
 		String won = request.getParameter("won");
+		System.out.printf("Parameters are: slot1: %s slot2 %s bracketID1 %s won %s\n", slot1, slot2, bracketID1, won);
 		boolean success = true;
 		String error = null;
 		if (slot1 != null && slot2 != null && bracketID1 != null && won != null) {
@@ -45,9 +46,9 @@ public class UpdateBracket extends HttpServlet {
 				slotTwo = Integer.parseInt(slot2);
 				bracketID = Integer.parseInt(bracketID1);
 				success = true;
-				if (!won.equals("yes") && !won.equals("no")) {
+				if (!won.equals("true")) {
 					success = false;
-					error = "please enter whether won is yes or no";
+					error = "please enter whether a valid value for won";
 				} 
 			} catch (NumberFormatException e) {
 				error = "please enter valid slot numbers and bracket IDs";
@@ -58,6 +59,9 @@ public class UpdateBracket extends HttpServlet {
 					error = "The backend sucks lolol";
 				}
 			}
+		} else {
+			success = false;
+			error = "Things were null";
 		}
 		PrintWriter out = response.getWriter();
 		if (success) {

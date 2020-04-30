@@ -2,6 +2,7 @@ package tournaments;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import bracket.Bracket;
+import bracket.BracketOverview;
 import sql.JDBCBracketStuff;
 
 /**
@@ -51,12 +53,21 @@ public class DisplayBracket extends HttpServlet {
 			if (session != null) {
 				Object ui = session.getAttribute("userID");
 				if (ui != null) {
-					int userID = Integer.parseInt((String)ui);
+					int userID = (Integer)ui;
 					isHost = JDBCBracketStuff.isHost(bracketID, userID);
 				}
 			}
+			BracketOverview b2 = JDBCBracketStuff.getBracketOverview(bracketID);
+			request.setAttribute("bracketID", bracketID);
+			boolean pending = b2.getType() == 0;
+			request.setAttribute("pend", pending);
+			System.out.println("pending set to " + pending);
+			System.out.println("bracket is");
+			System.out.println(b);
 			request.setAttribute("bracketData", b);
 			request.setAttribute("isHost", isHost);
+			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/bracket.jsp");
+			dispatch.forward(request, response);
 		}
 	}
 
