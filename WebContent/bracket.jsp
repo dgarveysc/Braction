@@ -7,11 +7,18 @@
 <title>Tournament Bracket</title>
 	<link rel="stylesheet" href="bracket.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-165111822-1"></script>
 	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());  gtag('config', 'UA-165111822-1');
+	</script>
+	<script>
+	
 	
 	<% 
 	int bracketID=Integer.parseInt(request.getParameter("bracketID"));
-	Object overview = request.getAttribute("pend");
+	Object overview = request.getAttribute("overview");
 	Object host = request.getAttribute("isHost");
 	boolean pending= true;
 	boolean isHost = false;
@@ -19,7 +26,7 @@
 	if (overview != null && host != null) {
 		b2 = (BracketOverview)overview;
 		isHost = (boolean)host;
-		pending = (b2.getType() == 0) && !isHost;
+		pending = (b2.getType() == 0) || !isHost;
 	}	
 	%>
 	<% if (!pending) {%>
@@ -163,7 +170,7 @@ if ((blap = currUsers.get(index)) != null) {
 </div>
  <div id="bracketName">
 <%
-out.print(b2.getName());
+out.print("<strong>" + b2.getName() + "</strong>");
 %>
 </div>
 <div id="theGameType">
@@ -171,12 +178,12 @@ out.print(b2.getName());
 out.print("This bracket is for " + b2.getGameType());
 %>
 </div>
-<div id="editing message">
+<div id="editing-message">
 <%if (!isHost) {
 	
 	out.print("Please log in as the host to edit this bracket");
 } else if (pending) {
-	out.print("Please wait for the bracet to be full before updating it");
+	out.print("Please wait for the bracket to be full before updating it");
 }
 
 %>
