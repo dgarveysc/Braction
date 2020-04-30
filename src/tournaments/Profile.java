@@ -81,7 +81,7 @@ public class Profile extends HttpServlet {
 			success = false;
 		}
 		if (success) {
-			stats(request, userid);
+			stats(request, response, userid);
 			getFriends(request, userID);
 			request.setAttribute("userBrackets", b);
 			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/profile.jsp");
@@ -103,7 +103,7 @@ public class Profile extends HttpServlet {
 		r.setAttribute("friends", JDBCBracketStuff.getFriends(userID));
 	}
 	
-	private void stats(HttpServletRequest request, String testID) {
+	private void stats(HttpServletRequest request, HttpServletResponse response, String testID) {
 		if (JDBCBracketStuff.conn == null) {
 			JDBCBracketStuff.initConnection();
 		}
@@ -213,270 +213,272 @@ public class Profile extends HttpServlet {
 				request.setAttribute("numPlayed", 0);
 				request.setAttribute("elo", 1000);
 				
-				throw new Exception("No games played");
+				//throw new Exception("No games played");
 				
 			}
-			System.out.println("Got here 2");
-
-			//VERIFY THAT THE USERS TESTID IS VALID, CATCH EXCEPTION
-			String userIDString = String.valueOf(testID);
-
-
-			//now order eloChange list by date
-			eloChanges.sort(new EloComparator());
-
-
-			//FileWriter fw = new FileWriter(userIDString + ".txt");
-			//String stringPath = "/";
-			//String absolutePath = getServletContext().getRealPath(stringPath);
-			//System.out.println(absolutePath);
-			
-			
-			PrintWriter pw = new PrintWriter("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userIDString + ".txt");
-
-			int curElo = 1000;
-
-
-			Vector<Integer> oppRkWins = new Vector<Integer>();
-			Vector<Integer> oppRkLosses = new Vector<Integer>();
-
-			System.out.println("Got here 3");
-
-			//now output list to file, of scores not changes or oppRank:
-			pw.print("1000\n");
-			for(int i = 0; i < eloChanges.size(); i++)
+			else
 			{
-				System.out.println("curElo printing is: " + curElo);
-				curElo += eloChanges.get(i).getElo();
-				System.out.println("after curElo printing is: " + curElo);
-				if(i == eloChanges.size()-1)
+				System.out.println("Got here 2");
+	
+				//VERIFY THAT THE USERS TESTID IS VALID, CATCH EXCEPTION
+				String userIDString = String.valueOf(testID);
+	
+	
+				//now order eloChange list by date
+				eloChanges.sort(new EloComparator());
+	
+	
+				//FileWriter fw = new FileWriter(userIDString + ".txt");
+				//String stringPath = "/";
+				//String absolutePath = getServletContext().getRealPath(stringPath);
+				//System.out.println(absolutePath);
+				
+				
+				PrintWriter pw = new PrintWriter("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userIDString + ".txt");
+	
+				int curElo = 1000;
+	
+	
+				Vector<Integer> oppRkWins = new Vector<Integer>();
+				Vector<Integer> oppRkLosses = new Vector<Integer>();
+	
+				System.out.println("Got here 3");
+	
+				//now output list to file, of scores not changes or oppRank:
+				pw.print("1000\n");
+				for(int i = 0; i < eloChanges.size(); i++)
 				{
-					pw.print(curElo);
+					System.out.println("curElo printing is: " + curElo);
+					curElo += eloChanges.get(i).getElo();
+					System.out.println("after curElo printing is: " + curElo);
+					if(i == eloChanges.size()-1)
+					{
+						pw.print(curElo);
+					}
+					else {
+						pw.print(curElo + "\n");
+					}
+	
+					// if won, add oppRkWins // else oppRkLosses
+					if(eloChanges.get(i).getWon())
+					{
+						oppRkWins.add(eloChanges.get(i).getOppRank());
+					}
+					else {
+						oppRkLosses.add(eloChanges.get(i).getOppRank());
+					}
+	
+				}
+				pw.flush();
+				System.out.println("Got here 4");
+	
+	
+				ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\plot.py", userIDString);
+				Process p = pb.start();
+				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
+				// wait until done then continue with other stuff
+				InputStream in = p.getInputStream();
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+	
+				String pyInput = br.readLine(); //should buffer
+				System.out.println("PyInput is " + pyInput);
+	
+				if(!pyInput.contentEquals("Success"))  // figure out how to handle
+				{
+					System.out.println("PYTHON SCRIPT DID NOT WORK");
+					throw new Exception("script didn't work despite there being data");
+				}
+	
+				// now run Python script thru matPlotLib
+				
+				System.out.println("Got here 5");
+	
+				
+				// process data and output avg opp rank over winning games
+				Double wRank5 = 0.0;
+				Double wRank20 = 0.0;
+				Double wRankAll = 0.0;
+	
+				// same over losing games
+				Double lRank5 = 0.0;
+				Double lRank20 = 0.0;
+				Double lRankAll = 0.0;
+	
+				//compute median, 25%, 75% for winning rank
+				for(int i = oppRkWins.size()-1; i>= 0; i--)
+				{
+					Integer curRk = oppRkWins.get(i);
+					if(i >= oppRkWins.size()-5) //rank5
+					{
+						wRank5 += curRk; wRank20 += curRk; wRankAll += curRk;
+					}
+					else if(i >= oppRkWins.size()-20) //rank5
+					{
+						wRank20 += curRk;
+						wRankAll += curRk;
+					}
+					else {
+						wRankAll += curRk;
+					}
+				}
+				//compute averages
+	
+	
+				//do same for losing rank
+				for(int i = oppRkLosses.size()-1; i>= 0; i--)
+				{
+					Integer curRk = oppRkLosses.get(i);
+					if(i >= oppRkLosses.size()-5) //rank5
+					{
+						lRank5 += curRk; lRank20 += curRk; lRankAll += curRk;
+					}
+					else if(i >= oppRkLosses.size()-20) //rank5
+					{
+						lRank20 += curRk;
+						lRankAll += curRk;
+					}
+					else {
+						lRankAll += curRk;
+					}
+				}
+				
+				// logic here is if less games are played than specified, the average reflects that.
+				if(numWins != null && numWins <5 && numWins != 0)
+				{
+					wRank5 = wRank5 / numWins;
+					wRank20 = wRank5 / numWins;
 				}
 				else {
-					pw.print(curElo + "\n");
+					wRank5 = wRank5 / 5.0;
+					if(numWins != null && numWins < 20 && numWins != 0)
+					{
+						wRank20 = wRank20 / numWins;				
+					}
+					else {
+						wRank20 = wRank20/20.0;
+					}
 				}
-
-				// if won, add oppRkWins // else oppRkLosses
-				if(eloChanges.get(i).getWon())
+				
+				if(numWins != 0)
 				{
-					oppRkWins.add(eloChanges.get(i).getOppRank());
+					wRankAll = wRankAll / numWins;
+				}
+				
+				
+				// same for Losses
+				if(numLosses != null && numLosses <5 && numLosses != 0)
+				{
+					lRank5 = lRank5 / numLosses;
+					lRank20 = lRank5 / numLosses;
 				}
 				else {
-					oppRkLosses.add(eloChanges.get(i).getOppRank());
+					lRank5 = lRank5 / 5.0;
+					if(numLosses < 20 && numLosses != null && numLosses != 0)
+					{
+						lRank20 = lRank20 / numLosses;				
+					}
+					else {
+						lRank20 = lRank20/20.0;
+					}
 				}
-
-			}
-			pw.flush();
-			System.out.println("Got here 4");
-
-
-			ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\plot.py", userIDString);
-			Process p = pb.start();
-			// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
-			// wait until done then continue with other stuff
-			InputStream in = p.getInputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-			String pyInput = br.readLine(); //should buffer
-			System.out.println("PyInput is " + pyInput);
-
-			if(!pyInput.contentEquals("Success"))  // figure out how to handle
-			{
-				System.out.println("PYTHON SCRIPT DID NOT WORK");
-				throw new Exception("script didn't work despite there being data");
-			}
-
-			// now run Python script thru matPlotLib
-			
-			System.out.println("Got here 5");
-
-			
-			// process data and output avg opp rank over winning games
-			Double wRank5 = 0.0;
-			Double wRank20 = 0.0;
-			Double wRankAll = 0.0;
-
-			// same over losing games
-			Double lRank5 = 0.0;
-			Double lRank20 = 0.0;
-			Double lRankAll = 0.0;
-
-			//compute median, 25%, 75% for winning rank
-			for(int i = oppRkWins.size()-1; i>= 0; i--)
-			{
-				Integer curRk = oppRkWins.get(i);
-				if(i >= oppRkWins.size()-5) //rank5
+				
+				if(numLosses != 0)
 				{
-					wRank5 += curRk; wRank20 += curRk; wRankAll += curRk;
+					lRankAll = lRankAll / numLosses;
 				}
-				else if(i >= oppRkWins.size()-20) //rank5
+	
+				Collections.sort(oppRkWins);
+				Collections.sort(oppRkLosses);
+	
+				Integer win25 = 0;
+				Integer win50 = 0;
+				Integer win75 = 0;
+				Integer lose25 = 0;
+				Integer lose50 = 0;
+				Integer lose75 = 0;
+	
+				if(oppRkWins.size() > 0)
 				{
-					wRank20 += curRk;
-					wRankAll += curRk;
+					win25 = oppRkWins.get((oppRkWins.size()-1)/4);
+					win50 = oppRkWins.get(oppRkWins.size()/2);
+					win75 = oppRkWins.get(oppRkWins.size()*3/4);
 				}
-				else {
-					wRankAll += curRk;
-				}
-			}
-			//compute averages
-
-
-			//do same for losing rank
-			for(int i = oppRkLosses.size()-1; i>= 0; i--)
-			{
-				Integer curRk = oppRkLosses.get(i);
-				if(i >= oppRkLosses.size()-5) //rank5
+				if(oppRkLosses.size() > 0)
 				{
-					lRank5 += curRk; lRank20 += curRk; lRankAll += curRk;
+					lose25 = oppRkLosses.get((oppRkLosses.size()-1)/4);
+					lose50 = oppRkLosses.get(oppRkLosses.size()/2);
+					lose75 = oppRkLosses.get(oppRkLosses.size()*3/4);
 				}
-				else if(i >= oppRkLosses.size()-20) //rank5
+	
+				//compute average opponent rank
+				if(numPlayed != 0)
 				{
-					lRank20 += curRk;
-					lRankAll += curRk;
+					avgOppRank = ((double) sumOppRank) / ((double) numPlayed);
+					avgRound = ((double) sumRounds) / ((double) numPlayed);
 				}
-				else {
-					lRankAll += curRk;
-				}
-			}
-			
-			// logic here is if less games are played than specified, the average reflects that.
-			if(numWins != null && numWins <5 && numWins != 0)
-			{
-				wRank5 = wRank5 / numWins;
-				wRank20 = wRank5 / numWins;
-			}
-			else {
-				wRank5 = wRank5 / 5.0;
-				if(numWins != null && numWins < 20 && numWins != 0)
+				
+				request.setAttribute("numPlayed", numPlayed);
+				request.setAttribute("numWins", numWins);
+				request.setAttribute("numLosses", numLosses);
+	
+				request.setAttribute("avgOppW5", wRank5);
+				request.setAttribute("avgOppW20", wRank20);
+				request.setAttribute("avgOppWAll", wRankAll);
+				
+				request.setAttribute("avgOppL5", lRank5);
+				request.setAttribute("avgOppL20", lRank20);
+				request.setAttribute("avgOppLAll", lRankAll);
+	
+				
+				request.setAttribute("win25", win25);
+				request.setAttribute("win50", win50);
+				request.setAttribute("win75", win75);
+				request.setAttribute("lose25", lose25);
+				request.setAttribute("lose50", lose50);
+				request.setAttribute("lose75", lose75);
+				
+				
+				request.setAttribute("avgOppRank", avgOppRank);
+				request.setAttribute("avgRound", avgRound);
+				request.setAttribute("numBWins", numBWins);
+				request.setAttribute("elo", curElo);
+				
+				// here System printing
+				System.out.println("numPlayed" + numPlayed);
+				System.out.println("numWins" + numWins);
+				System.out.println("numLosses" + numLosses);
+	
+				System.out.println("avgOppW5" + wRank5);
+				System.out.println("avgOppW20" + wRank20);
+				System.out.println("avgOppWAll" + wRankAll);
+				
+				System.out.println("avgOppL5" + lRank5);
+				System.out.println("avgOppL20" + lRank20);
+				System.out.println("avgOppLAll" + lRankAll);
+	
+				
+				System.out.println("win25" + win25);
+				System.out.println("win50" + win50);
+				System.out.println("win75" + win75);
+				System.out.println("lose25" + lose25);
+				System.out.println("lose50" + lose50);
+				System.out.println("lose75" + lose75);
+				
+				
+				System.out.println("avgOppRank" + avgOppRank);
+				System.out.println("avgRound" + avgRound);
+				System.out.println("numBWins" + numBWins);
+				System.out.println("elo" + curElo);
+	
+	
+				if(numPlayed != 0)
 				{
-					wRank20 = wRank20 / numWins;				
-				}
-				else {
-					wRank20 = wRank20/20.0;
-				}
-			}
-			
-			if(numWins != 0)
-			{
-				wRankAll = wRankAll / numWins;
-			}
-			
-			
-			// same for Losses
-			if(numLosses != null && numLosses <5 && numLosses != 0)
-			{
-				lRank5 = lRank5 / numLosses;
-				lRank20 = lRank5 / numLosses;
-			}
-			else {
-				lRank5 = lRank5 / 5.0;
-				if(numLosses < 20 && numLosses != null && numLosses != 0)
-				{
-					lRank20 = lRank20 / numLosses;				
-				}
-				else {
-					lRank20 = lRank20/20.0;
+					request.setAttribute("img5", "five"+testID + ".png");
+					request.setAttribute("img20", "twenty"+testID + ".png");
+					request.setAttribute("imgAll", "all"+testID + ".png");
 				}
 			}
-			
-			if(numLosses != 0)
-			{
-				lRankAll = lRankAll / numLosses;
-			}
-
-			Collections.sort(oppRkWins);
-			Collections.sort(oppRkLosses);
-
-			Integer win25 = 0;
-			Integer win50 = 0;
-			Integer win75 = 0;
-			Integer lose25 = 0;
-			Integer lose50 = 0;
-			Integer lose75 = 0;
-
-			if(oppRkWins.size() > 0)
-			{
-				win25 = oppRkWins.get((oppRkWins.size()-1)/4);
-				win50 = oppRkWins.get(oppRkWins.size()/2);
-				win75 = oppRkWins.get(oppRkWins.size()*3/4);
-			}
-			if(oppRkLosses.size() > 0)
-			{
-				lose25 = oppRkLosses.get((oppRkLosses.size()-1)/4);
-				lose50 = oppRkLosses.get(oppRkLosses.size()/2);
-				lose75 = oppRkLosses.get(oppRkLosses.size()*3/4);
-			}
-
-			//compute average opponent rank
-			if(numPlayed != 0)
-			{
-				avgOppRank = ((double) sumOppRank) / ((double) numPlayed);
-				avgRound = ((double) sumRounds) / ((double) numPlayed);
-			}
-			
-			request.setAttribute("numPlayed", numPlayed);
-			request.setAttribute("numWins", numWins);
-			request.setAttribute("numLosses", numLosses);
-
-			request.setAttribute("avgOppW5", wRank5);
-			request.setAttribute("avgOppW20", wRank20);
-			request.setAttribute("avgOppWAll", wRankAll);
-			
-			request.setAttribute("avgOppL5", lRank5);
-			request.setAttribute("avgOppL20", lRank20);
-			request.setAttribute("avgOppLAll", lRankAll);
-
-			
-			request.setAttribute("win25", win25);
-			request.setAttribute("win50", win50);
-			request.setAttribute("win75", win75);
-			request.setAttribute("lose25", lose25);
-			request.setAttribute("lose50", lose50);
-			request.setAttribute("lose75", lose75);
-			
-			
-			request.setAttribute("avgOppRank", avgOppRank);
-			request.setAttribute("avgRound", avgRound);
-			request.setAttribute("numBWins", numBWins);
-			request.setAttribute("elo", curElo);
-			
-			// here System printing
-			System.out.println("numPlayed" + numPlayed);
-			System.out.println("numWins" + numWins);
-			System.out.println("numLosses" + numLosses);
-
-			System.out.println("avgOppW5" + wRank5);
-			System.out.println("avgOppW20" + wRank20);
-			System.out.println("avgOppWAll" + wRankAll);
-			
-			System.out.println("avgOppL5" + lRank5);
-			System.out.println("avgOppL20" + lRank20);
-			System.out.println("avgOppLAll" + lRankAll);
-
-			
-			System.out.println("win25" + win25);
-			System.out.println("win50" + win50);
-			System.out.println("win75" + win75);
-			System.out.println("lose25" + lose25);
-			System.out.println("lose50" + lose50);
-			System.out.println("lose75" + lose75);
-			
-			
-			System.out.println("avgOppRank" + avgOppRank);
-			System.out.println("avgRound" + avgRound);
-			System.out.println("numBWins" + numBWins);
-			System.out.println("elo" + curElo);
-
-
-			if(numPlayed != 0)
-			{
-				request.setAttribute("img5", "five"+testID + ".png");
-				request.setAttribute("img20", "twenty"+testID + ".png");
-				request.setAttribute("imgAll", "all"+testID + ".png");
-			}
-		
-			
+				
 		} catch (SQLException sqle) {
 			//however we error handle
 
@@ -490,9 +492,9 @@ public class Profile extends HttpServlet {
 			e.printStackTrace();
 		}
 		finally {
-			String nextJSP = "/profile.jsp";
-			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
-			dispatcher.forward(request,response);
+			//String nextJSP = "/profile.jsp";
+			//RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+			
 			try {
 				if (rs != null) {
 					rs.close();

@@ -32,7 +32,7 @@ public class JDBCBracketStuff {
     private static final String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static SecureRandom random = new SecureRandom();
     
-    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=root";
+    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=okamoto928";
     
     public static void initConnection() {
 		if (conn != null) {
@@ -998,8 +998,10 @@ public class JDBCBracketStuff {
 						break;
 					case 10:
 						friends.get(1).add(f); // pending friends rq
+						break;
 					case 3:
 						friends.get(0).add(f); // received friend rq
+						break;
 					}
 				}
 				else
@@ -1155,6 +1157,10 @@ public class JDBCBracketStuff {
 			JDBCBracketStuff.initConnection();
 		}
 		int receiveID = getUserID(friendName);
+		if(receiveID == requestID)
+		{
+			return 5;
+		}
 		System.out.println("RecevieID: " + receiveID);
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1210,7 +1216,7 @@ public class JDBCBracketStuff {
 	
 	public static void main(String[] args) {
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=okamoto928");
 			BracketIdCodePair b = JDBCBracketStuff.createBracket(1, "godgamers", 1);
 			System.out.println("bracketCreated");
 			int godGamerID = 1;

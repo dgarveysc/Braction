@@ -62,7 +62,7 @@ public class NewAccount extends HttpServlet {
 			
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
-				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=root");
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=okamoto928");
 				st = connection.prepareStatement("SELECT * FROM users WHERE email=?");
 				st.setString(1, email);
 				rs = st.executeQuery();
