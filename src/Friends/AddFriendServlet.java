@@ -41,7 +41,7 @@ public class AddFriendServlet extends HttpServlet {
 		int userID2 = 0;
 		try {
 			//Using prepared statement to see if the username password combination returns a user
-			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/SportsWebsite?user=root&password=&serverTimezone=UTC");
+			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/SportsWebsite?user=root&password=okamoto928");
 			st = connection.prepareStatement("SELECT * FROM Friends WHERE userID1=? AND userID2=?");
 			getUsername = connection.prepareStatement("SELECT * FROM users WHERE username=?");
 			addUser = connection.prepareStatement("INSERT INTO Friends (userID1, userID2, acceptedStatus) VALUES (?, ?, ?)"); 

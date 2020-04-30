@@ -915,7 +915,7 @@ public class JDBCBracketStuff {
 		ResultSet rs = null;
 		Friend u = null;
 		try {
-			ps = conn.prepareStatement("SELECT username, elo FROM Users WHERE userID=?");
+			ps = conn.prepareStatement("SELECT username, points FROM Users WHERE userID=?");
 			ps.setString(1, Integer.toString(friendID));
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -949,7 +949,7 @@ public class JDBCBracketStuff {
 		friends.add(new LinkedList<Friend>());
 		friends.add(new LinkedList<Friend>());		
 		try {
-			ps = conn.prepareStatement("SELECT userID2, acceptedStatus FROM friendID WHERE userID=?");
+			ps = conn.prepareStatement("SELECT userID2, acceptedStatus FROM friends WHERE userID1=?");
 			ps.setString(1, Integer.toString(userID));
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -1083,10 +1083,11 @@ public class JDBCBracketStuff {
 		int userID= -1;
 		try {
 			System.out.println("adding stats");
-			ps = conn.prepareStatement("SELECT userID FROM Users WHERE userID=?");
+			ps = conn.prepareStatement("SELECT userID FROM Users WHERE username=?");
 			ps.setString(1, username);
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				System.out.println("here");
 				userID = rs.getInt(1);
 				if (rs.wasNull()) {
 					userID = -1;
@@ -1120,6 +1121,7 @@ public class JDBCBracketStuff {
 			JDBCBracketStuff.initConnection();
 		}
 		int receiveID = getUserID(friendName);
+		System.out.println("RecevieID: " + receiveID);
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		if (receiveID == -1) {

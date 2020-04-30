@@ -1,6 +1,8 @@
 package Friends;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -50,8 +52,9 @@ public class AddFriend extends HttpServlet {
 		}
 		int result = -1;
 		if (success) {
-			String friendUsername = request.getParameter("usernameToAdd");
+			String friendUsername = request.getParameter("friendUsername");
 			result = JDBCBracketStuff.addFriend(userID, friendUsername);
+			System.out.println(result);
 		}
 		PrintWriter out = response.getWriter();
 		out.print(result);

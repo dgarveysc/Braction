@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" 
+import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack" import="java.util.Vector" import="java.util.Queue" import="Friends.Friend"%>
 <!Doctype HTML>
 <html>
     <head>
@@ -33,6 +34,11 @@
             .radio-text {
                 color: rgb(170, 193, 212);
             }
+            
+            .addError {
+			    color: red;
+			    font-size: 2em;
+            }
 
             /*.add-friend-content {
                 padding-top: 2%;
@@ -56,6 +62,49 @@
                     $(".previous-tab span").html(previousTab);
                 });
             });
+        	
+            function addFriend() {
+                // First, ensure the form is completely filled out
+                /*var v = valTCode();
+                if (v == false) {
+                    return false;
+                }*/
+                var error = false;
+                // Using jQuery
+                $.ajax({
+                    url: 'AddFriend',
+                    data: {
+                        friendUsername: document.addForm.friendInput.value
+                    },
+                    success: function (result) {
+                    	alert(result);
+                    	if(result == 3){
+                    		$("#addResponse").text("Friend request sent to " + friendUsername + ".");
+                    		return false;
+                    	}else if(result == 0){
+                            $("#addResponse").text("Username does not exist.");
+                            error = true;
+                            return false;
+                    	}else if(result == 1) {
+                    		$("#addResponse").text("User is already a friend.");
+                    		error = true;
+                    		return false;
+                    	}
+                    	else if(result == 2) {
+                    		$("#addResponse").text("Request has already been sent.");
+                    		return false;
+                    	}
+                    	else if(result == -1) {
+                    		$("#addResponse").text("Request failed.");
+                    		return false;
+                    	}
+                    }
+
+                });
+                return false;
+
+
+            }
         </script>
 
     </head>
@@ -191,7 +240,6 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <%= pending.size() %>
                                         	<% 
                                                while(!pending.isEmpty())
                                                {
@@ -250,10 +298,29 @@
                             <div class="friends-table">
                             <!-- start form for adding friend -->
                                 <div class="add-friend-content">
-									<form method="post" action="AddFriendServlet" class="add-form">
-										<input class="form-control" type="text" name="friend-input" placeholder="Enter username">
-								    	<button type="button" class="btn btn-light" id="add-button">Add Friend</button>
-									</form>          
+                                <% 
+                                    	Object friendLists = request.getAttribute("friends");
+                            			String error = "not null";
+                            			if(friendLists == null)
+                            			{
+                            				error = "error! null!";
+                            			}
+                                    	if(friendLists != null)
+                                    	{
+                                    		Vector<Queue<Friend>> friendQueues = (Vector<Queue<Friend>>)friendLists;
+                                    		Queue<Friend> received = friendQueues.get(0);
+                                    		error = ((Integer)received.size()).toString();
+                                    		Queue<Friend> pending = friendQueues.get(1);
+                                    		error += ((Integer)pending.size()).toString();
+                                    		Queue<Friend> ourFriends = friendQueues.get(2);
+                                    		error += ((Integer)ourFriends.size()).toString();
+                           		 %>
+									<form method="post" action="AddFriendServlet" class="add-form" name="addForm">
+										<input class="form-control" type="text" name="friendInput" placeholder="Enter username">
+								    	<button type="button" class="btn btn-light" id="add-button" onclick="addFriend()">Add Friend</button>
+									</form>
+									<div id="addResponse" class="addError"></div>   
+									<div><%= error %></div>       
 								</div>
                                 <!-- End form for adding friend -->
                                 <div class="table-content">
@@ -262,6 +329,7 @@
                                     <form action="" method="post" name="friends-list-form">
                                         <table>
                                             <thead>
+                                            
                                             <tr>
                                                 <th class="table-heading">Username</th>
                                                 <th class="table-heading">Action</th>
@@ -270,27 +338,16 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                <%
-	                                            String friends = (String)request.getAttribute("numFriends");
-	                                            
-	                                            if(friends == null) 
-	                                            {
-	                                            	friends = "0";
-	                                            }
-	                                            
-	                                            int numFriends = Integer.parseInt(friends);
-	                                            for(int i = 0; i < numFriends; i++)
-                                                {
-                                                    String username = (String)request.getAttribute("username");
-													
-                                                    // shouldn't be null, but to make sure it doesn't break
-                                                    if(username == null) {
-                                                        username = "Friend ";
-                                                    }
-                                            	%>
-                                                    <td class="item-text" id="friend-username"><%= username %></td>
+                                                <% 
+	                                               while(!ourFriends.isEmpty())
+	                                               {
+	                                                   Friend nextFriend = ourFriends.remove(); // make sure this works how i think
+	                                                   String friendName = nextFriend.getName();
+	                                                   int ranking = nextFriend.getElo(); // change so that we compute ranking
+                                           		 %>
+                                                    <td class="item-text" id="friend-username"><%= friendName %></td>
                                                     <td><a href="#" class="delete" id="delete-friend">Delete</a></td>
-                                                    <td class="item-text">1234</td>
+                                                    <td class="item-text"><%= ranking %></td>
                                                 </tr>
 	                                            <%
 	                                                }
@@ -311,12 +368,22 @@
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            	<% 
+	                                               while(!received.isEmpty())
+	                                               {
+	                                                   Friend nextFriend = received.remove(); // make sure this works how i think
+	                                                   String requesterName = nextFriend.getName();
+	                                                   int ELO = nextFriend.getElo(); 
+                                           		 %>
                                                 <tr>
-                                                    <td class="item-text" id="friend-username">csci201</td>
+                                                    <td class="item-text" id="friend-username"><%= requesterName %></td>
                                                     <td><a href="#" class="edit" id="accept-request">Accept</a></td>
                                                     <td><a href="#" class="delete" id="reject-request">Reject</a></td>
-                                                    <td class="item-text">1234</td>
+                                                    <td class="item-text"><%= ELO %></td>
                                                 </tr>
+                                                <%
+	                                               }
+                                                %>
                                             </tbody>
                                         </table>
                                     </form>
@@ -334,16 +401,29 @@
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            	<% 
+	                                               while(!pending.isEmpty())
+	                                               {
+	                                                   Friend nextFriend = pending.remove(); // make sure this works how i think
+	                                                   String sentFriendName = nextFriend.getName();
+                                           		 %>
                                                 <tr>
-                                                    <td class="item-text" id="friend-username">csci201</td>
+                                                    <td class="item-text" id="friend-username"><%= sentFriendName %></td>
                                                     <td><a href="#" class="delete" id="cancel-requst">Cancel Request</a></td>
                                                     <td class="item-text">Pending</td>
                                                 </tr>
+                                                <%
+	                                               }
+                                                %>
                                             </tbody>
                                         </table>
                                     </form>
                                     <!-- End of Pending Requests-->
+                                    <%
+                                   		} // end if statement
+                                	%>
                                 </div>
+                                
                             </div> <!-- End Friends Table -->
                         </div> <!--End Friends Tab-->
                         <div class="tab-pane fade" id="stats">
