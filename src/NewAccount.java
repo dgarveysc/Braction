@@ -94,7 +94,7 @@ public class NewAccount extends HttpServlet {
 					newuser.setString(1, username);
 					newuser.setString(2, password);
 					newuser.setString(3, email);
-					newuser.setInt(4, 0);
+					newuser.setInt(4, 1000);
 					newuser.execute();
                     request.setAttribute("loggedIn", "true");
                     HttpSession session = request.getSession();
