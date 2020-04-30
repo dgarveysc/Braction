@@ -10,11 +10,28 @@ input [type=button]{
   background-color: rgb(205, 223, 240);
 }
 
+/* Start CSS for Back Button*/
+
+.back {
+	float: left;
+	margin-left: 5%;
+}
+
+#back-button {
+	background: #697693;
+	color: #ffffff;
+	line-height: 3;
+	width: 110%;
+	border: 1px;
+}
+
+/* End CSS for Back Button */
 
 .wrapper {
   display: flex;
   height: 600px;
   justify-content: center;
+  margin-top: 10%;
 }
 
 .item {

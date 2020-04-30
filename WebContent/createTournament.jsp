@@ -56,7 +56,7 @@
                 },
                 success: function (result) {
                 	if(result[0] != 'A' && result[0] != 'Y'){
-                		$("#tCOdee").html("<div> Success! Please navigate to your <a class=\"link\" href=\"profile.jsp\"> profile page </a> to view the tournament! </div>");
+                		$("#tCOdee").html("<div> Success! Please navigate to your <a class=\"link\" href=\"Profile\"> profile page </a> to view the tournament! </div>");
                 	}else{
                         $("#tCOdee").html("<div>" + result + " Please try a different code. </div>");
                 	}
@@ -72,20 +72,53 @@
 
 <body>
 <% 
-		boolean loggedIn = false;
+	boolean loggedIn = false;
+	if(session.getAttribute("userID") != null)
+	{
+		loggedIn = true;
+		int userID = (Integer)session.getAttribute("userID");
+		//int userIDInt = Integer.parseInt(userID);
+	}
+	
+	//boolean loggedIn = false;
+	HttpSession s = request.getSession(false);
+	String profile = "";
+	String createTournament = "";
+	String currentUser = (String)s.getAttribute("username");
+	String home = "";
+	String login = "";
+	String logout = "";
+	String createActive = "";
+	String loginActive = "";
+	// If the user is signed in, display home, favorites and logout
+	if(currentUser != null){
+	    home = "inline";
+	    createTournament = "inline";
+	    login = "none";
+	    profile = "inline";
+	    logout = "inline";
+	    createActive = "active";
+	}else{
+		loginActive="active";
+		RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/login-sign-up.jsp");
+		dispatch.forward(request, response);
+	} 
+	
+
+
+/*boolean loggedIn = false;
 		HttpSession s = request.getSession();
 		String profile = "";
 		String username = (String)s.getAttribute("username");
 		if(username != null){
 			profile = "<form method=\"GET\" action=\"Profile\"> <!-- User ID --> <input type=\"hidden\" name=\"userID\" value=\"1\"><a href=\"profile.jsp\"><input type=\"submit\" class=\"button profile-button\" value=\"Profile\"></a></form><a href=\"#\" class=\"button create-button link\">Create Tournament</a><button class=\"button create-button\" value=\"Logout\" onclick=\"logout()\">Logout</button>";
 		}else{
-			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/login-sign-up.jsp");
-			dispatch.forward(request, response);
-		}
+			
+		}*/
 
 	
 	%>
-    <div class="container">
+
         <div class="row">
 
 
@@ -99,17 +132,29 @@
             </div>
             <div class="col">
                 <div class="nav-area">
-                    <a href="index.jsp">
-                            <input type="submit" class="button home-button" value="Home" id="active">
-                    </a>
-                
-				<div>
-					<%= profile %>
-				
-				</div>
+	                <a href="index.jsp" style="display: <%=home %>">
+						<input type="submit" class="button home-button" value="Home">
+					</a>
+					<a href="createTournament.jsp" style="display: <%= createTournament %>" >
+						<input type="submit" class="button create-button" value="Create Tournament" id="<%= createActive %>">
+					</a>
+					<form method="GET" action="Profile">
+					<!-- User ID -->
+						<!-- input type="hidden" name="userID" value="1"> -->
+						<a href="profile.jsp" style="display: <%= profile %>">
+							<input type="submit" class="button profile-button" value="Profile">
+						</a>
+					</form>
+					<a href="login-sign-up.jsp" style="display: <%= login %>">
+						<input type="submit" class="button login-button" value="Login/Sign Up" id="<%= loginActive %>">
+					</a>
+					<a href="index.jsp">
+	                    <input type="submit" style="display: <%= logout %>" class="button logout-button" value="Logout" onclick="logout()">
+	                </a>
                 </div>
             </div>
         </div>
+	<div class="container">
         <hr width="100%" style="padding-bottom: 5%">
 
         <div class="row main">

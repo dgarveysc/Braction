@@ -155,6 +155,11 @@ if ((blap = currUsers.get(index)) != null) {
 
 
 %>
+<div class="back">
+	<form method="GET" action="Profile">
+			<input type="submit" id="back-button" value="Back to Profile"/>
+	</form>
+</div>
 <div class="wrapper">
   <div class="item">
     <div class="item-winner">

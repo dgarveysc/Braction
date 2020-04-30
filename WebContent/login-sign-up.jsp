@@ -97,7 +97,6 @@
 		}
 		
 	%>
-    <div class="container">
         <div class="row">
 
 
@@ -113,20 +112,20 @@
 
                 <div class="nav-area">
                     <a href="index.jsp">
-                        <input type="submit" class="button home-button" value="Home" id="active">
+                        <input type="submit" class="button home-button" value="Home">
                     </a>
                     <a href="createTournament.jsp">
                         <input type="submit" class="button create-button" value="Create Tournament">
                     </a>
                 
                     <a href="#">
-                        <input type="submit" class="button login-button" value="Login/Sign Up">
+                        <input type="submit" class="button login-button" value="Login/Sign Up" id="active">
                     </a>
                 </div>
             </div>
         </div>
 
-
+    <div class="container">
         <hr width="100%" style="padding-bottom: 5%">
         <div class="row main">
             <div class="col text">

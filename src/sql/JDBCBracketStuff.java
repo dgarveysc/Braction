@@ -929,7 +929,7 @@ public class JDBCBracketStuff {
 				System.out.println("something found");
 				int friendID = rs.getInt(1);
 				int acceptedStatus = rs.getInt(2);
-				ps.close();
+				//ps.close();
 				ps = conn.prepareStatement("DELETE FROM Friends WHERE friendID=?");
 				ps.setString(1, Integer.toString(friendID));
 				ps.executeUpdate();
