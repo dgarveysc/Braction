@@ -783,7 +783,7 @@ public class JDBCBracketStuff {
 					ps.setString(2, Integer.toString(bracketID));
 					ps.executeUpdate();
 					System.out.println("Running the stats Update");
-					if (userExists(uID1) && userExists(uID2)) {
+					if (userIDofUserToStats(uID1) != -1 && userIDofUserToStats(uID2) != -1) {//userExists(uID1) && userExists(uID2)) {
 						statsMethods s = new statsMethods(uID1, slot1Won, uID2, round);
 						s.start();
 						success = true;

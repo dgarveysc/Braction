@@ -432,22 +432,104 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                         </div> <!--End Friends Tab-->
                         <div class="tab-pane fade" id="stats">
                             <div class="stats-table">
+                            <%
+                           		Object checkNull = request.getAttribute("numPlayed");
+	                            int numPlayed = 0;
+	                    		int numWins = 0;
+	                    		int numLosses = 0;
+	                    		double avgOppW5 = 0.0;
+	                    		double avgOppW20 = 0;
+	                    		double avgOppWAll = 0;
+	                    		double avgOppL5 = 0;
+	                    		double avgOppL20 = 0;
+	                    		double avgOppLAll = 0;
+	                    		int win25 = 0;
+	                    		int win50 = 0;
+	                    		int win75 = 0;
+	                    		int lose25 = 0;
+	                    		int lose50 = 0;
+	                    		int lose75 = 0;
+	                    		double avgOppRank = 0;
+	                    		double avgRound = 0;
+	                    		int numBWins = 0;
+	                    		int elo = 1000;
+	                    		boolean gamePlayed = false;
+	                    		String img5 = "";
+	                    		String img20 = "";
+	                    		String imgAll = "";
+	                    		if(checkNull != null && ((Integer)checkNull != 0))
+                            	{
+	                    			
+                            		numPlayed = (Integer)checkNull;
+                            		
+                            		// int
+		                            //numPlayed = (int)request.getAttribute("numPlayed");
+		            				numWins = (Integer)request.getAttribute("numWins");
+		            				numLosses = (Integer)request.getAttribute("numLosses");
+		            	
+		            				// doubles
+		            				avgOppW5 = (Double)request.getAttribute("avgOppW5");
+		            				avgOppW20 = (Double)request.getAttribute("avgOppW20");
+		            				avgOppWAll = (Double)request.getAttribute("avgOppWAll");
+		            				
+		            				// doubles 
+		            				avgOppL5 = (Double)request.getAttribute("avgOppL5");
+		            				avgOppL20 = (Double)request.getAttribute("avgOppL20");
+		            				avgOppLAll = (Double)request.getAttribute("avgOppLAll");
+		            	
+		            				// int
+		            				win25 = (Integer)request.getAttribute("win25");
+		            				win50 = (Integer)request.getAttribute("win50");
+		            				win75 = (Integer)request.getAttribute("win75");
+		            				lose25 = (Integer)request.getAttribute("lose25");
+		            				lose50 = (Integer)request.getAttribute("lose50");
+		            				lose75 = (Integer)request.getAttribute("lose75");
+		            				
+		            				// double
+		            				avgOppRank = (Double)request.getAttribute("avgOppRank");
+		            				avgRound = (Double)request.getAttribute("avgRound");
+		            				//int
+		            				numBWins = (Integer)request.getAttribute("numBWins");
+		            				// int
+		            				elo = (Integer)request.getAttribute("elo");
+		            				img5 = (String)request.getAttribute("img5");
+		            				img20 = (String)request.getAttribute("img20");
+		            				imgAll = (String)request.getAttribute("imgAll");
+		            				gamePlayed = true;
+                            	}
+                            
+                            %>
                                 <h4 class="mt-2">Stats</h4>
                                 <p class="stat-heading"><strong>ELO: </strong></p>
-                                <p id="curElo" class="stat">123</p>
+                                <p id="curElo" class="stat"><%= elo %></p>
                                 <!-- Start Images Row -->
 	                                <div class="row" id="graph-row" align="center">
 										<div class="col-4">
 											<p class="graph-heading"><strong>Past 5 Games:</strong></p>
-											<img src="graph.png" alt="Graph of last 5 games" class="graph">
+											<%
+												if(gamePlayed)
+												{
+													out.println("<img src=\"" + img5 + "\" alt=\"Graph of last 5 games\" class=\"graph\">");
+												}
+											%>
 										</div>
 										<div class="col-4">
 											<p class="graph-heading"><strong>Past 20 Games:</strong></p>
-											<img src="graph.png" alt="Graph of last 20 games" class="graph">
+											<%
+												if(gamePlayed)
+												{
+													out.println("<img src=\"" + img20 + "\" alt=\"Graph of last 20 games\" class=\"graph\">");
+												}
+											%>
 										</div>
 										<div class="col-4">
 											<p class="graph-heading"><strong>All Games:</strong></p>
-											<img src="graph.png" alt="Graph of all user games" class="graph">
+											<%
+												if(gamePlayed)
+												{
+													out.println("<img src=\"" + imgAll + "\" alt=\"Graph of all games\" class=\"graph\">");
+												}
+											%>
 										</div>
 									</div>
 								<!-- End Images Row -->
@@ -455,9 +537,9 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 									<div class="row" id="other-stats-row" align="center">
 										<div class="col-4" id="winCol">
 											<p class="stat-heading"><strong>Win Opponent Rank: </strong></p><br/>
-                                			<p id="medWinOppRank" class="stat">Median: 12</p><br/>
-                                			<p id="winOppRank25" class="stat">25th Percentile: 12</p><br/>
-                                			<p id="winOppRank75" class="stat">75th Percentile: 12</p><br/> 			
+                                			<p id="medWinOppRank" class="stat">Median: <%= win50 %></p><br/>
+                                			<p id="winOppRank25" class="stat">25th Percentile: <%= win25 %></p><br/>
+                                			<p id="winOppRank75" class="stat">75th Percentile: <%= win75 %></p><br/> 			
 										</div>
 										<!-- Start Pie Chart -->
 										<div class="col-4" id="pieChartCol">
@@ -472,8 +554,8 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 													function drawChart() {
 													  var data = google.visualization.arrayToDataTable([
 													  ['Total', 'Percentage'],
-													  ['Wins', 6], // win value
-													  ['Losses', 2] // loss value
+													  ['Wins', <%= numWins %>], // win value
+													  ['Losses', <%= numLosses %>] // loss value
 													]);
 													
 													  // Optional; add a title and set the width and height of the chart
@@ -499,9 +581,9 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 										<!-- End Pie Chart -->
 										<div class="col-4" id="lossCol">
 											<p class="stat-heading"><strong>Loss Opponent Rank: </strong></p><br/>
-                                			<p id="medLossOppRank" class="stat">Median: 12</p><br/>
-                                			<p id="lossOppRank25" class="stat">25th Percentile: 12</p><br/>
-                                			<p id="lossOppRank75" class="stat">75th Percentile: 12</p><br/>
+                                			<p id="medLossOppRank" class="stat">Median: <%= lose50 %></p><br/>
+                                			<p id="lossOppRank25" class="stat">25th Percentile: <%= lose25 %></p><br/>
+                                			<p id="lossOppRank75" class="stat">75th Percentile: <%= lose75 %></p><br/>
 										</div>
 									</div>
 									<!-- End Other Stats Row -->
@@ -509,15 +591,15 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 									<div class="row" id="totals-row" align="center">
 										<div class="col-4" id="totalWinsCol">
 											<p class="stat-heading"><strong>Total Wins: </strong></p>
-                        					<p id="numWins" class="stat">12</p><br/>
+                        					<p id="numWins" class="stat"><%= numWins %></p><br/>
 										</div>
 										<div class="col-4" id="totalLossCol">
 											<p class="stat-heading"><strong>Total Losses: </strong></p>
-                        					<p id="numLoss" class="stat">12</p><br/>
+                        					<p id="numLoss" class="stat"><%= numLosses %></p><br/>
 										</div>
 										<div class="col-4" id="totalGamesCol">
 											<p class="stat-heading"><strong>Total Games: </strong></p>
-                        					<p id="numWins" class="stat">1234</p><br/>
+                        					<p id="numWins" class="stat"><%= numPlayed %></p><br/>
 										</div>
 										
 									</div>
@@ -526,18 +608,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 									<div class="row" id="random-stats-row" align="center">
 										<div class="col-4" id="avgRoundCol">
 											<p class="stat-heading"><strong>Average Round: </strong></p>
-                        					<p id="avgRound" class="stat">12</p><br/>
-										</div>
-										<div class="col-4" id="numEarnedCol">
-											<p class="stat-heading"><strong>Earned: </strong></p>
-                        					<p id="numEarned" class="stat">12</p><br/>
+                        					<p id="avgRound" class="stat"><%= avgRound %></p><br/>
 										</div>
 										<div class="col-4" id="extra">
 										</div>
 									</div>
 									<!--  End Random Stats Row -->
-									
-									
 									<%
 									
 									/*<div class="col-6" id="totalCol">
