@@ -7,18 +7,6 @@
 <title>Tournament Bracket</title>
 	<link rel="stylesheet" href="bracket.css">
 	<script>
-	function change(curr, opponent, next, currentSlot, opponentSlot){
-		var c = document.getElementById(curr);//current
-		var n = document.getElementById(next);//next
-		var o = document.getElementById(opponent);//opponent, the person against current	
-		
-		if(n.value=="TBD") {//if player wins
-			n.value=c.value;//move current player to the next round
-			var xhttp=new XMLHttpRequest();
-			xhttp.open("POST","DisplayBracket.java"+currentSlot+true+bracketID);//call to servlet
-			xhttp.send();
-		}
-	}
 	
 	<% int bracketID=Integer.parseInt(request.getParameter("bracketID"));%>
 	 $( document ).ready(function() {
@@ -27,6 +15,9 @@
      		var c = document.getElementById(curr);//current
      		var n = document.getElementById(next);//next
      		var o = document.getElementById(opponent);//opponent, the person against current	
+     		if(n.value=="TBD"){
+     			n.value=c.value;
+     		}
      		
      		$.ajax({
                  url: 'UpdateBracket',
@@ -37,29 +28,12 @@
      				 win : true
                  },
                  success: function (result) {
-                 	if(result == 3){
+                 	if(result == "Succeeded!"){
                  		$("#addResponse").text("Friend request sent to " + friendUsername + ".");
                  		return false;
-                 	}else if(result == 0){
-                         $("#addResponse").text("Username does not exist.");
-                         error = true;
-                         return false;
-                 	}else if(result == 1) {
-                 		$("#addResponse").text("User is already a friend.");
-                 		error = true;
-                 		return false;
                  	}
-                 	else if(result == 2) {
-                 		$("#addResponse").text("Request has already been sent.");
-                 		return false;
-                 	}
-                 	else if(result == 5) {
-                 		$("#addResponse").text("Cannot add yourself.");
-                 		return false;
-                 	}
-                 	else if(result == -1) {
-                 		$("#addResponse").text("Request failed.");
-                 		return false;
+                 	else{
+                 		alert(result);
                  	}
                  }
      		});
