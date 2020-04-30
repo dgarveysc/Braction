@@ -54,7 +54,7 @@ public class UpdateBracket extends HttpServlet {
 				error = "please enter valid slot numbers and bracket IDs";
 			}
 			if (success) {
-				if (!JDBCBracketStuff.update(slotOne, slotTwo, won.equals("yes"), bracketID)) {
+				if (!JDBCBracketStuff.update(slotOne, slotTwo, won.equals("true"), bracketID)) {
 					success = false;
 					error = "The backend sucks lolol";
 				}
