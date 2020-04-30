@@ -307,6 +307,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
+                                            <th class="table-heading">Game Type</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -317,10 +318,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 	                                                   String name = nextBracket.getName();
 	                                                   String hostName = nextBracket.getHostName();
 	                                                   int id = nextBracket.getId();
+	                                                   String gameTypeActive = nextBracket.getGameType();
                                             %>
                                         <tr>
                                                 <td class="item-text"><a href="DisplayBracket?bracketID=<%=id%>"><%= name %></a></td>
                                                 <td class="item-text"><%= hostName %></td>
+                                                <td class="item-text"><%= gameTypeActive %></td>
                                         </tr>
                                             <%
                                                 }
@@ -336,6 +339,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
+                                            <th class="table-heading">Game Type</th>
                                             <th class="table-heading">Vacant Spots</th>
                                         </tr>
                                         </thead>
@@ -348,10 +352,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                                    String hostName = nextBracket.getHostName();
                                                    int vacantSpots = nextBracket.getVacantSpots();
                                                    int id = nextBracket.getId();
+                                                   String gameTypePending = nextBracket.getGameType();
                                             %>
                                             <tr>
                                             	<td class="item-text"><a href="DisplayBracket?bracketID=<%=id%>"><%= name %></a></td>
                                                 <td class="item-text"><%= hostName %></td>
+                                            	<td class="item-text"><%= gameTypePending %></td>
                                                 <td class="item-text"><%= vacantSpots %></td>
                                             </tr>
                                             <%
@@ -367,6 +373,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
+                                            <th class="table-heading">Game Type</th>
                                             <th class="table-heading">Winner</th>
                                          </tr>
                                         </thead>
@@ -379,10 +386,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                                    String hostName = nextBracket.getHostName();
                                                    String winner = nextBracket.getWinnerName();
                                                    int id = nextBracket.getId();
+                                                   String gameTypeFinished = nextBracket.getGameType();
                                             %>
                                             <tr>
                                                 <td class="item-text"><a href="DisplayBracket?bracketID=<%=id%>"><%= name %></a></td>
                                                 <td class="item-text"><%= hostName %></td>
+                                                <td class="item-text"><%= gameTypeFinished %></td>
                                                 <td class="item-text"><%= winner %></td>
                                             </tr>
                                             <%
