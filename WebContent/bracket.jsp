@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="bracket.Bracket"%>    
+    pageEncoding="UTF-8" import="bracket.Bracket" import="java.util.List" import ="bracket.UserToStats"%>    
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,18 +8,12 @@
 	<link rel="stylesheet" href="bracket.css">
 	<script>
 	function change(curr, opponent, next, currentSlot, opponentSlot){
-		//first get the slot number of current and oponent
-		
-		//IF NEXT VALUE IS "TBD" REPLACE WITH VALUE OF CURR
 		var c = document.getElementById(curr);//current
 		var n = document.getElementById(next);//next
-		var o = document.getElementById(opponent);//opponent, the person against current
-		
+		var o = document.getElementById(opponent);//opponent, the person against current	
 		
 		if(n.value=="TBD") {//if player wins
 			n.value=c.value;//move current player to the next round
-			//submit curr, opponent, true, bracketID(c,n, true, bracketID);
-			//also? or maybe alternativel? y submit opponent, curr, false, bracketID (o,c,false, bracketID)
 			var xhttp=new XMLHttpRequest();
 			xhttp.open("POST","DisplayBracket.java"+currentSlot+true+bracketID);//call to servlet
 			xhttp.send();
@@ -44,12 +38,8 @@
 </head>
 <body>
 <%
-
-//bracket is a list of usertostats
-//usertostats is UsertoStats(user, won)
-//User(id, name)
 Bracket bracket=(Bracket)(request.getAttribute("bracketData"));//assuming bracket for eight users in it 
-int bracketID=Integer.parseInteger(request.getAttribute("bracketID"));//set bracket id
+int bracketID=Integer.parseInt(request.getParameter("bracketID"));//set bracket id
 List<UserToStats> currUsers=bracket.getBracket();
 int index=0;
 //FIRST WE NEED TO LOAD IN USERNAMES
@@ -75,7 +65,6 @@ String roundTwoFour="TBD";
 String roundThreeOne="TBD";//first winner of round three
 String roundThreeTwo="TBD";
 String finalWinner="TBD";//final winner
-
 %>
 <div class="wrapper">
   <div class="item">
