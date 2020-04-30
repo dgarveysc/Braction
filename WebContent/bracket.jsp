@@ -38,21 +38,21 @@ int bracketID=Integer.parseInt(request.getParameter("bracketID"));//set bracket 
 List<UserToStats> currUsers=bracket.getBracket();
 int index=0;
 //FIRST WE NEED TO LOAD IN USERNAMES
-String playerOne=currUsers.get(index).getUser.getName();
+String playerOne=currUsers.get(index).getUser().getName();
 index++;
-String playerTwo=currUsers.get(index).getUser.getName();
+String playerTwo=currUsers.get(index).getUser().getName();
 index++;
-String playerThree=currUsers.get(index).getUser.getName();
+String playerThree=currUsers.get(index).getUser().getName();
 index++;
-String playerFour=currUsers.get(index).getUser.getName();
+String playerFour=currUsers.get(index).getUser().getName();
 index++;
-String playerFive=currUsers.get(index).getUser.getName();
+String playerFive=currUsers.get(index).getUser().getName();
 index++;
-String playerSix=currUsers.get(index).getUser.getName();
+String playerSix=currUsers.get(index).getUser().getName();
 index++;
-String playerSeven=currUsers.get(index).getUser.getName();
+String playerSeven=currUsers.get(index).getUser().getName();
 index++;
-String playerEight=currUsers.get(index).getUser.getName();
+String playerEight=currUsers.get(index).getUser().getName();
 String roundTwoOne="TBD";//first winner of round two
 String roundTwoTwo="TBD";//second winner of round two
 String roundTwoThree="TBD";

@@ -33,7 +33,7 @@ public class StatsListerner extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session =request.getSession(false);
 		int userID = -1;
-		
+		System.out.println("Stats listener called");
 		boolean success = true;
 		Object ui = session.getAttribute("userID");
 		String userid = null;
@@ -41,13 +41,13 @@ public class StatsListerner extends HttpServlet {
 			success = false;
 		} else {
 			try {
-				userID = Integer.parseInt((String)ui);
-				userid = (String) ui;
+				userID = (int)ui;//Integer.parseInt((String)ui);
+				//userid = (String) ui;
 			} catch (NumberFormatException e) {
 				success = false;
 			}
 		}
-		int currElo = Integer.parseInt("currElo");
+		int currElo = Integer.parseInt(request.getParameter("currElo"));
 		int newElo;
 		while ((newElo = JDBCBracketStuff.getEloOfUser(userID)) == -1 || newElo == currElo) {
 			try {
@@ -59,6 +59,7 @@ public class StatsListerner extends HttpServlet {
 		}
 		PrintWriter out = response.getWriter();
 		out.print(newElo);
+		out.flush();
 		
 	}
 

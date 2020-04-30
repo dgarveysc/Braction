@@ -536,7 +536,7 @@ public class JDBCBracketStuff {
 		ResultSet rs = null;
 		int elo = -1;
 		try {
-			ps = conn.prepareStatement("SELECT elo FROM Users WHERE userID=?");
+			ps = conn.prepareStatement("SELECT points FROM Users WHERE userID=?");
 			ps.setString(1, Integer.toString(userID));
 			rs = ps.executeQuery();
 			if (rs.next()) {

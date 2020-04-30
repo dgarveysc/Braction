@@ -63,52 +63,141 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                 });
             });
         	
-            function addFriend() {
-                // First, ensure the form is completely filled out
-                /*var v = valTCode();
-                if (v == false) {
+        	
+        	
+            
+            $( document ).ready(function() {
+                console.log( "ready!" );
+                function acceptFriend(friendU) {
+            		$.ajax({
+                        url: 'AddFriend',
+                        data: {
+                            friendUsername: friendU
+                        },
+                        success: function (result) {
+                        	if(result == 3){
+                        		$("#addResponse").text("Friend request sent to " + friendUsername + ".");
+                        		return false;
+                        	}else if(result == 0){
+                                $("#addResponse").text("Username does not exist.");
+                                error = true;
+                                return false;
+                        	}else if(result == 1) {
+                        		$("#addResponse").text("User is already a friend.");
+                        		error = true;
+                        		return false;
+                        	}
+                        	else if(result == 2) {
+                        		$("#addResponse").text("Request has already been sent.");
+                        		return false;
+                        	}
+                        	else if(result == 5) {
+                        		$("#addResponse").text("Cannot add yourself.");
+                        		return false;
+                        	}
+                        	else if(result == -1) {
+                        		$("#addResponse").text("Request failed.");
+                        		return false;
+                        	}
+                        }
+            		});
+            	}
+            	
+            	function cancelRequest(friendId) {
+            		$.ajax({
+                        url: 'CancelRequest',
+                        data: {
+                            friendID: friendId
+                        },
+                        success: function (result) {
+                        	if(result == 3){
+                        		$("#addResponse").text("Request canceled.");
+                        		return false;
+                        	}else if(result == 0){
+                                $("#addResponse").text("Cannot remove yourself.");
+                                error = true;
+                                return false;
+                        	}else if(result == 1) {
+                        		$("#addResponse").text("Cannot remove user that doesn't exist.");
+                        		error = true;
+                        		return false;
+                        	}
+                        	else if(result == 2) {
+                        		$("#addResponse").text("Request already accepted.");
+                        		return false;
+                        	}
+                        	else if(result == -1) {
+                        		$("#addResponse").text("Request failed.");
+                        		return false;
+                        	}
+                        }
+            		});
+            	}
+            	
+                function addFriend() {
+                    // First, ensure the form is completely filled out
+                    /*var v = valTCode();
+                    if (v == false) {
+                        return false;
+                    }*/
+                    var error = false;
+                    // Using jQuery
+                    $.ajax({
+                        url: 'AddFriend',
+                        data: {
+                            friendUsername: document.addForm.friendInput.value
+                        },
+                        success: function (result) {
+                        	if(result == 3){
+                        		$("#addResponse").text("Friend request sent to " + friendUsername + ".");
+                        		return false;
+                        	}else if(result == 0){
+                                $("#addResponse").text("Username does not exist.");
+                                error = true;
+                                return false;
+                        	}else if(result == 1) {
+                        		$("#addResponse").text("User is already a friend.");
+                        		error = true;
+                        		return false;
+                        	}
+                        	else if(result == 2) {
+                        		$("#addResponse").text("Request has already been sent.");
+                        		return false;
+                        	}
+                        	else if(result == 5) {
+                        		$("#addResponse").text("Cannot add yourself.");
+                        		return false;
+                        	}
+                        	else if(result == -1) {
+                        		$("#addResponse").text("Request failed.");
+                        		return false;
+                        	}
+                        }
+
+                    });
                     return false;
-                }*/
-                var error = false;
-                // Using jQuery
-                $.ajax({
-                    url: 'AddFriend',
-                    data: {
-                        friendUsername: document.addForm.friendInput.value
-                    },
-                    success: function (result) {
-                    	alert(result);
-                    	if(result == 3){
-                    		$("#addResponse").text("Friend request sent to " + friendUsername + ".");
-                    		return false;
-                    	}else if(result == 0){
-                            $("#addResponse").text("Username does not exist.");
-                            error = true;
-                            return false;
-                    	}else if(result == 1) {
-                    		$("#addResponse").text("User is already a friend.");
-                    		error = true;
-                    		return false;
-                    	}
-                    	else if(result == 2) {
-                    		$("#addResponse").text("Request has already been sent.");
-                    		return false;
-                    	}
-                    	else if(result == 5) {
-                    		$("#addResponse").text("Cannot add yourself.");
-                    		return false;
-                    	}
-                    	else if(result == -1) {
-                    		$("#addResponse").text("Request failed.");
-                    		return false;
-                    	}
-                    }
+                }
+                refresh = function() {
+                	$.ajax({
+                        url: 'StatsListerner',
+                        data: {
+                            currElo: $("#curElo").text()
+                        },
+                        success: function (result) {
+                        	alert("Your Elo changed to " + result);
+                        	$("#curElo").text(result);
+                        	refresh();
+                        }
 
+                    });
+                }
+                
+                $(function(){
+                    refresh();
                 });
-                return false;
+            
+            });
 
-
-            }
         </script>
 
     </head>
@@ -336,7 +425,6 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                             
                                             <tr>
                                                 <th class="table-heading">Username</th>
-                                                <th class="table-heading">Action</th>
                                                 <th class="table-heading">Ranking</th>
                                             </tr>
                                             </thead>
@@ -350,7 +438,6 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 	                                                   int ranking = nextFriend.getElo(); // change so that we compute ranking
                                            		 %>
                                                     <td class="item-text" id="friend-username"><%= friendName %></td>
-                                                    <td><a href="#" class="delete" id="delete-friend">Delete</a></td>
                                                     <td class="item-text"><%= ranking %></td>
                                                 </tr>
 	                                            <%
@@ -367,7 +454,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                             <thead>
                                             <tr>
                                                 <th class="table-heading" id="friend-username">Username</th>
-                                                <th class="table-heading" colspan="2">Action</th>
+                                                <th class="table-heading">Action</th>
                                                 <th class="table-heading">ELO</th>
                                             </tr>
                                             </thead>
@@ -381,8 +468,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                            		 %>
                                                 <tr>
                                                     <td class="item-text" id="friend-username"><%= requesterName %></td>
-                                                    <td><a href="#" class="edit" id="accept-request">Accept</a></td>
-                                                    <td><a href="#" class="delete" id="reject-request">Reject</a></td>
+                                                    <td><button type="button" class="btn btn-light" id="accept-button" onclick="acceptFriend( <%= requesterName %>)">Accept</button></td>
                                                     <td class="item-text"><%= ELO %></td>
                                                 </tr>
                                                 <%
@@ -410,10 +496,11 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 	                                               {
 	                                                   Friend nextFriend = pending.remove(); // make sure this works how i think
 	                                                   String sentFriendName = nextFriend.getName();
+	                                                   int friendId = nextFriend.getId();
                                            		 %>
                                                 <tr>
                                                     <td class="item-text" id="friend-username"><%= sentFriendName %></td>
-                                                    <td><a href="#" class="delete" id="cancel-requst">Cancel Request</a></td>
+                                                    <td><button type="button" class="btn btn-light" id="cancel-button" onclick="cancelRequest(<%= friendId %>)">Cancel Request</button></td>
                                                     <td class="item-text">Pending</td>
                                                 </tr>
                                                 <%
