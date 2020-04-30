@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import sql.JDBCBracketStuff;
+
 @WebServlet("/Login")
 public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -26,10 +28,11 @@ public class Login extends HttpServlet {
 				Connection connection = null;
 				PreparedStatement st = null;
 				ResultSet rs = null;
-				
+				if (JDBCBracketStuff.conn == null) {
+					JDBCBracketStuff.initConnection();
+				}
 				try {
-					Class.forName("com.mysql.cj.jdbc.Driver");
-					connection = DriverManager.getConnection("jdbc:mysql://localhost/sportswebsite?user=root&password=okamoto928");
+					connection = JDBCBracketStuff.conn;
 					st = connection.prepareStatement("SELECT * FROM Users WHERE username=? AND passphrase=?");
 					st.setString(1, username);
 					st.setString(2, password);
@@ -62,7 +65,7 @@ public class Login extends HttpServlet {
 						//RequestDispatcher dispatch = getServletContext().getRequestDispatcher(next);
 						//dispatch.forward(request, response);
 					}
-				} catch (ClassNotFoundException | SQLException e) {
+				} catch (SQLException e) {
 					e.printStackTrace();
 				} /*finally {
 					try {

@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import sql.JDBCBracketStuff;
+
 @WebServlet("/NewAccount")
 public class NewAccount extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -59,10 +61,12 @@ public class NewAccount extends HttpServlet {
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			ResultSet getUserID = null;
-			
+			if (JDBCBracketStuff.conn == null) {
+				JDBCBracketStuff.initConnection();
+			}
 			try {
-				Class.forName("com.mysql.cj.jdbc.Driver");
-				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/sportswebsite?user=root&password=okamoto928");
+				
+				connection = JDBCBracketStuff.conn;
 				st = connection.prepareStatement("SELECT * FROM users WHERE email=?");
 				st.setString(1, email);
 				rs = st.executeQuery();
@@ -72,6 +76,9 @@ public class NewAccount extends HttpServlet {
 					System.out.println("Email already taken");
 					return;
 				}
+				rs.close();
+				
+				st.close();
 				// Check if the username is in the database
 				st = connection.prepareStatement("SELECT * FROM users WHERE username=?");
 				st.setString(1, username);
@@ -83,7 +90,7 @@ public class NewAccount extends HttpServlet {
 				}
 				else {
 					//Register user in the database and return a new page with favorites and logout
-					PreparedStatement newuser = connection.prepareStatement("INSERT INTO Users (username, passphrase, email, points) VALUES (?, ?, ?, ?)");
+					PreparedStatement newuser = JDBCBracketStuff.conn.prepareStatement("INSERT INTO Users (username, passphrase, email, points) VALUES (?, ?, ?, ?)");
 					newuser.setString(1, username);
 					newuser.setString(2, password);
 					newuser.setString(3, email);
@@ -105,7 +112,7 @@ public class NewAccount extends HttpServlet {
 					}
 					
 					//Getting the userID
-					ps = connection.prepareStatement("SELECT userID FROM users WHERE username=?");
+					ps = JDBCBracketStuff.conn.prepareStatement("SELECT userID FROM users WHERE username=?");
 					ps.setString(1, username);
 					getUserID = ps.executeQuery();
 					if(getUserID.next()) {

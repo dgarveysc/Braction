@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="bracket.Bracket"%>    
+    pageEncoding="UTF-8" import="bracket.Bracket" import="java.util.List" import ="bracket.UserToStats"%>    
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,25 +49,25 @@
 //usertostats is UsertoStats(user, won)
 //User(id, name)
 Bracket bracket=(Bracket)(request.getAttribute("bracketData"));//assuming bracket for eight users in it 
-int bracketID=Integer.parseInteger(request.getAttribute("bracketID"));//set bracket id
+int bracketID=Integer.parseInt(request.getParameter("bracketID"));//set bracket id
 List<UserToStats> currUsers=bracket.getBracket();
 int index=0;
 //FIRST WE NEED TO LOAD IN USERNAMES
-String playerOne=currUsers.get(index).getUser.getName();
+String playerOne=currUsers.get(index).getUser().getName();
 index++;
-String playerTwo=currUsers.get(index).getUser.getName();
+String playerTwo=currUsers.get(index).getUser().getName();
 index++;
-String playerThree=currUsers.get(index).getUser.getName();
+String playerThree=currUsers.get(index).getUser().getName();
 index++;
-String playerFour=currUsers.get(index).getUser.getName();
+String playerFour=currUsers.get(index).getUser().getName();
 index++;
-String playerFive=currUsers.get(index).getUser.getName();
+String playerFive=currUsers.get(index).getUser().getName();
 index++;
-String playerSix=currUsers.get(index).getUser.getName();
+String playerSix=currUsers.get(index).getUser().getName();
 index++;
-String playerSeven=currUsers.get(index).getUser.getName();
+String playerSeven=currUsers.get(index).getUser().getName();
 index++;
-String playerEight=currUsers.get(index).getUser.getName();
+String playerEight=currUsers.get(index).getUser().getName();
 String roundTwoOne="TBD";//first winner of round two
 String roundTwoTwo="TBD";//second winner of round two
 String roundTwoThree="TBD";

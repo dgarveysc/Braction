@@ -111,7 +111,9 @@ public class Profile extends HttpServlet {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ResultSet rs2 = null;
-
+		if (JDBCBracketStuff.conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
 		Set<Integer> statIDs = null;
 		
 		Boolean noGames = false;
