@@ -201,10 +201,6 @@ public class NewAccount extends HttpServlet {
 					{
 						st.close();
 					}
-					if(connection != null)
-					{
-						connection.close();
-					}
 				} catch (SQLException sqle2) {
 					System.out.println(sqle2.getMessage());
 				}

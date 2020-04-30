@@ -78,7 +78,7 @@ public class BracketOverview implements Serializable {
 	
 	public String toString() {
 		return String.format(
-				"Bracket with name %s with id %d hosted by %s has %d vacant spots and winner %s\n", 
-				name, id, hostName, vacantSpots, winnerName);
+				"Bracket with name %s with id %d hosted by %s has %d vacant spots and winner %s and type %d\n", 
+				name, id, hostName, vacantSpots, winnerName, type);
 	}
 }
