@@ -80,7 +80,7 @@ public class BracketOverview implements Serializable {
 		return hostName;
 	}
 	
-	private String getGameType() {
+	public String getGameType() {
 		return gameType;
 	}
 	

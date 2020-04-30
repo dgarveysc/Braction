@@ -166,7 +166,7 @@ if ((blap = currUsers.get(index)) != null) {
 </div>
 <div id="theGameType">
 <%
-
+out.print(b2.getGameType());
 %>
 </div>
 <div id="editing message">
