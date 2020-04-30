@@ -528,6 +528,40 @@ public class JDBCBracketStuff {
 		return u;
 	}
 	
+	public static int getEloOfUser(int userID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int elo = -1;
+		try {
+			ps = conn.prepareStatement("SELECT elo FROM Users WHERE userID=?");
+			ps.setString(1, Integer.toString(userID));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				String Elo = rs.getString(1);
+				if (Elo != null) {
+					elo = Integer.parseInt(Elo);
+				}
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return elo;
+	}
+	
 	private static UserToStats getUserToStats(String userToStatsID) {
 		if (conn == null) {
 			JDBCBracketStuff.initConnection();
