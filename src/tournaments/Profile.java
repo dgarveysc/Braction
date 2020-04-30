@@ -53,7 +53,6 @@ public class Profile extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session =request.getSession(false);
 		int userID = -1;
-		int gameType = -1;
 		
 		boolean success = true;
 		Object ui = session.getAttribute("userID");

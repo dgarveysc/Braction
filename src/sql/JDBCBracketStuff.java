@@ -885,7 +885,7 @@ public class JDBCBracketStuff {
 			for (int i = 2; i <= 15; i++) {
 				sb.append(String.format(", bracketS%d", i));
 			}
-			String query = String.format("SELECT bracketName, gameType, %s FROM Bracket WHERE bracketID=?", sb.toString());
+			String query = String.format("SELECT bracketName, gameType, %s, bracketCode FROM Bracket WHERE bracketID=?", sb.toString());
 			System.out.printf("Executing query: %s\n", query);
 			ps = conn.prepareStatement(query);
 			System.out.println("BracketID: " + bracketID);
@@ -896,6 +896,7 @@ public class JDBCBracketStuff {
 				int gameType = Integer.parseInt(rs.getString(2));
 				String gametype = getGameType(gameType);
 				String hostName = getUserToStats(rs.getString(10)).getUser().getName();
+				String code = rs.getString(18);
 				int vacantSpots = 0;
 				boolean done = rs.getString(3) != null;
 				for (int i = 8; i <= 15; i++) {
@@ -905,11 +906,11 @@ public class JDBCBracketStuff {
 					}
 				}
 				if (vacantSpots > 0) {
-					b = new BracketOverview(bracketName, bracketID, vacantSpots, hostName, gametype);
+					b = new BracketOverview(bracketName, bracketID, vacantSpots, hostName, gametype, code);
 				} else if (done) {
-					b = new BracketOverview(bracketName, bracketID, getUserToStats(rs.getString(3)).getUser().getName(), hostName, gametype);
+					b = new BracketOverview(bracketName, bracketID, getUserToStats(rs.getString(3)).getUser().getName(), hostName, gametype, code);
 				} else {
-					b = new BracketOverview(bracketName, bracketID, hostName, gametype);
+					b = new BracketOverview(bracketName, bracketID, hostName, gametype, code);
 				}
 				
 			} 

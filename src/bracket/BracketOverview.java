@@ -15,12 +15,13 @@ public class BracketOverview implements Serializable {
 	private String hostName;
 	private int id;
 	private String gameType;
+	private String code;
 	
 	/**
 	 * Active Tournament constructor
 	 * @param name
 	 */
-	public BracketOverview(String name, int id, String hostName, String gameType) {
+	public BracketOverview(String name, int id, String hostName, String gameType, String code) {
 		this.name = name;
 		this.id = id;
 		this.vacantSpots = 0;
@@ -28,6 +29,7 @@ public class BracketOverview implements Serializable {
 		this.hostName = hostName;
 		this.type = 1;
 		this.gameType = gameType;
+		this.code = code;
 	}
 	
 	/**
@@ -36,7 +38,7 @@ public class BracketOverview implements Serializable {
 	 * @param vacantSpots
 	 * @param id
 	 */
-	public BracketOverview(String name, int id, int vacantSpots, String hostName, String gameType) {
+	public BracketOverview(String name, int id, int vacantSpots, String hostName, String gameType, String code) {
 		this.id = id;
 		this.name = name;
 		this.vacantSpots = vacantSpots;
@@ -44,9 +46,10 @@ public class BracketOverview implements Serializable {
 		this.hostName = hostName;
 		this.type = 0;
 		this.gameType = gameType;
+		this.code = code;
 	}
 	
-	public BracketOverview(String name, int id, String winnerName, String hostName, String gameType) {
+	public BracketOverview(String name, int id, String winnerName, String hostName, String gameType, String code) {
 		this.id = id;
 		this.name = name;
 		this.winnerName = winnerName;
@@ -54,6 +57,7 @@ public class BracketOverview implements Serializable {
 		this.hostName = hostName;
 		this.type = 2;
 		this.gameType = gameType;
+		this.code = code;
 	}
 
 	public int getType() {
@@ -82,6 +86,10 @@ public class BracketOverview implements Serializable {
 	
 	public String getGameType() {
 		return gameType;
+	}
+	
+	public String getCode() {
+		return code;
 	}
 	
 	public String toString() {

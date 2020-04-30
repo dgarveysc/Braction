@@ -11,7 +11,7 @@
 	
 	<% 
 	int bracketID=Integer.parseInt(request.getParameter("bracketID"));
-	Object overview = request.getAttribute("pend");
+	Object overview = request.getAttribute("overview");
 	Object host = request.getAttribute("isHost");
 	boolean pending= true;
 	boolean isHost = false;
@@ -19,7 +19,7 @@
 	if (overview != null && host != null) {
 		b2 = (BracketOverview)overview;
 		isHost = (boolean)host;
-		pending = (b2.getType() == 0) && !isHost;
+		pending = (b2.getType() == 0) || !isHost;
 	}	
 	%>
 	<% if (!pending) {%>
@@ -179,6 +179,13 @@ out.print("This bracket is for " + b2.getGameType());
 	out.print("Please wait for the bracet to be full before updating it");
 }
 
+%>
+</div>
+<div id="code">
+<%
+if (b2 != null) {
+	out.print("Bracket Code: " + b2.getCode());
+}
 %>
 </div>
 <div class="wrapper">
