@@ -59,11 +59,7 @@ public class DisplayBracket extends HttpServlet {
 			}
 			BracketOverview b2 = JDBCBracketStuff.getBracketOverview(bracketID);
 			request.setAttribute("bracketID", bracketID);
-			boolean pending = b2.getType() == 0;
-			request.setAttribute("pend", pending);
-			System.out.println("pending set to " + pending);
-			System.out.println("bracket is");
-			System.out.println(b);
+			request.setAttribute("overview", b2);
 			request.setAttribute("bracketData", b);
 			request.setAttribute("isHost", isHost);
 			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/bracket.jsp");

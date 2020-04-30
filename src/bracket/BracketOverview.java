@@ -14,18 +14,20 @@ public class BracketOverview implements Serializable {
 	private String winnerName;
 	private String hostName;
 	private int id;
+	private String gameType;
 	
 	/**
 	 * Active Tournament constructor
 	 * @param name
 	 */
-	public BracketOverview(String name, int id, String hostName) {
+	public BracketOverview(String name, int id, String hostName, String gameType) {
 		this.name = name;
 		this.id = id;
 		this.vacantSpots = 0;
 		this.winnerName = null;
 		this.hostName = hostName;
 		this.type = 1;
+		this.gameType = gameType;
 	}
 	
 	/**
@@ -34,22 +36,24 @@ public class BracketOverview implements Serializable {
 	 * @param vacantSpots
 	 * @param id
 	 */
-	public BracketOverview(String name, int id, int vacantSpots, String hostName) {
+	public BracketOverview(String name, int id, int vacantSpots, String hostName, String gameType) {
 		this.id = id;
 		this.name = name;
 		this.vacantSpots = vacantSpots;
 		this.winnerName = null;
 		this.hostName = hostName;
 		this.type = 0;
+		this.gameType = gameType;
 	}
 	
-	public BracketOverview(String name, int id, String winnerName, String hostName) {
+	public BracketOverview(String name, int id, String winnerName, String hostName, String gameType) {
 		this.id = id;
 		this.name = name;
 		this.winnerName = winnerName;
 		this.vacantSpots = 0;
 		this.hostName = hostName;
 		this.type = 2;
+		this.gameType = gameType;
 	}
 
 	public int getType() {
@@ -74,6 +78,10 @@ public class BracketOverview implements Serializable {
 	
 	public String getHostName() {
 		return hostName;
+	}
+	
+	private String getGameType() {
+		return gameType;
 	}
 	
 	public String toString() {

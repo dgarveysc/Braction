@@ -841,6 +841,38 @@ public class JDBCBracketStuff {
 		return isHost;
 	}
 	
+	private static String getGameType(int gameTypeID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String gameType= "";
+		try {
+			ps = conn.prepareStatement("SELECT gameTypeName FROM GameTypes WHERE gameTypeID=?");
+			ps.setString(1, Integer.toString(gameTypeID));
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				gameType = rs.getString(1);
+				
+			} 
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return gameType;
+	}
+	
 	public static BracketOverview getBracketOverview(int bracketID) {
 		if (conn == null) {
 			JDBCBracketStuff.initConnection();
@@ -862,6 +894,7 @@ public class JDBCBracketStuff {
 			if (rs.next()) {
 				String bracketName = rs.getString(1);
 				int gameType = Integer.parseInt(rs.getString(2));
+				String gametype = getGameType(gameType);
 				String hostName = getUserToStats(rs.getString(10)).getUser().getName();
 				int vacantSpots = 0;
 				boolean done = rs.getString(3) != null;
@@ -872,11 +905,11 @@ public class JDBCBracketStuff {
 					}
 				}
 				if (vacantSpots > 0) {
-					b = new BracketOverview(bracketName, bracketID, vacantSpots, hostName);
+					b = new BracketOverview(bracketName, bracketID, vacantSpots, hostName, gametype);
 				} else if (done) {
-					b = new BracketOverview(bracketName, bracketID, getUserToStats(rs.getString(3)).getUser().getName(), hostName);
+					b = new BracketOverview(bracketName, bracketID, getUserToStats(rs.getString(3)).getUser().getName(), hostName, gametype);
 				} else {
-					b = new BracketOverview(bracketName, bracketID, hostName);
+					b = new BracketOverview(bracketName, bracketID, hostName, gametype);
 				}
 				
 			} 

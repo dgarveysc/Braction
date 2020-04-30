@@ -81,7 +81,7 @@ public class Profile extends HttpServlet {
 			success = false;
 		}
 		if (success) {
-			stats(request, response, userid);
+			stats(request, userid);
 			getFriends(request, userID);
 			request.setAttribute("userBrackets", b);
 			RequestDispatcher dispatch = getServletContext().getRequestDispatcher("/profile.jsp");
@@ -103,7 +103,7 @@ public class Profile extends HttpServlet {
 		r.setAttribute("friends", JDBCBracketStuff.getFriends(userID));
 	}
 	
-	private void stats(HttpServletRequest request, HttpServletResponse response, String testID) {
+	private void stats(HttpServletRequest request, String testID) {
 		if (JDBCBracketStuff.conn == null) {
 			JDBCBracketStuff.initConnection();
 		}

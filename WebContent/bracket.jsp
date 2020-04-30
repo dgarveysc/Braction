@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page language="java" contentType="text/html; charset=UTF-8" import = "bracket.BracketOverview"
     pageEncoding="UTF-8" import="bracket.Bracket" import="java.util.List" import ="bracket.UserToStats"%>    
 <!DOCTYPE html>
 <html>
@@ -11,15 +11,16 @@
 	
 	<% 
 	int bracketID=Integer.parseInt(request.getParameter("bracketID"));
-	Object pend = request.getAttribute("pend");
+	Object overview = request.getAttribute("pend");
+	Object host = request.getAttribute("isHost");
 	boolean pending= true;
-	if (pend != null) {
-		pending = (boolean)pend;
-		%> alert("pending not null, it is <%=(boolean)pend %>"); <%
-	} else {
-		%> alert("pending was null");<%
-	}
-	
+	boolean isHost = false;
+	BracketOverview b2 = null;
+	if (overview != null && host != null) {
+		b2 = (BracketOverview)overview;
+		isHost = (boolean)host;
+		pending = (b2.getType() == 0) && !isHost;
+	}	
 	%>
 	<% if (!pending) {%>
 	 $( document ).ready(function() {
@@ -159,6 +160,24 @@ if ((blap = currUsers.get(index)) != null) {
 	<form method="GET" action="Profile">
 			<input type="submit" id="back-button" value="Back to Profile"/>
 	</form>
+</div>
+ <div id="bracketName">
+
+</div>
+<div id="theGameType">
+<%
+
+%>
+</div>
+<div id="editing message">
+<%if (!isHost) {
+	
+	out.print("Please log in as the host to edit this bracket");
+} else if (pending) {
+	out.print("Please wait for the bracet to be full before updating it");
+}
+
+%>
 </div>
 <div class="wrapper">
   <div class="item">
