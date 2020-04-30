@@ -20,6 +20,52 @@
 		}
 	}
 	
+	<% int bracketID=Integer.parseInt(request.getParameter("bracketID"));%>
+	 $( document ).ready(function() {
+         console.log( "ready!" );
+         function change(curr, opponent, next, currentSlot, opponentSlot){
+     		var c = document.getElementById(curr);//current
+     		var n = document.getElementById(next);//next
+     		var o = document.getElementById(opponent);//opponent, the person against current	
+     		
+     		$.ajax({
+                 url: 'UpdateBracket',
+                 data: {
+                     slot1 : currentSlot,
+     				 slot2 : opponentSlot,
+     				 bracketID: <%=bracketID%>,
+     				 win : true
+                 },
+                 success: function (result) {
+                 	if(result == 3){
+                 		$("#addResponse").text("Friend request sent to " + friendUsername + ".");
+                 		return false;
+                 	}else if(result == 0){
+                         $("#addResponse").text("Username does not exist.");
+                         error = true;
+                         return false;
+                 	}else if(result == 1) {
+                 		$("#addResponse").text("User is already a friend.");
+                 		error = true;
+                 		return false;
+                 	}
+                 	else if(result == 2) {
+                 		$("#addResponse").text("Request has already been sent.");
+                 		return false;
+                 	}
+                 	else if(result == 5) {
+                 		$("#addResponse").text("Cannot add yourself.");
+                 		return false;
+                 	}
+                 	else if(result == -1) {
+                 		$("#addResponse").text("Request failed.");
+                 		return false;
+                 	}
+                 }
+     		});
+     	}
+	 }
+	
 	function submitWinner(lastWinner){
 		//call servlet with whoever won
 		var winner=document.getElementById(lastWinner);
@@ -34,7 +80,7 @@
 <body>
 <%
 Bracket bracket=(Bracket)(request.getAttribute("bracketData"));//assuming bracket for eight users in it 
-int bracketID=Integer.parseInt(request.getParameter("bracketID"));//set bracket id
+//set bracket id
 List<UserToStats> currUsers=bracket.getBracket();
 int index=0;
 //FIRST WE NEED TO LOAD IN USERNAMES
