@@ -29,7 +29,7 @@ public class Login extends HttpServlet {
 				
 				try {
 					Class.forName("com.mysql.cj.jdbc.Driver");
-					connection = DriverManager.getConnection("jdbc:mysql://localhost/sportswebsite?user=root&password=root");
+					connection = DriverManager.getConnection("jdbc:mysql://localhost/sportswebsite?user=root&password=okamoto928");
 					st = connection.prepareStatement("SELECT * FROM Users WHERE username=? AND passphrase=?");
 					st.setString(1, username);
 					st.setString(2, password);

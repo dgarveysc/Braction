@@ -94,6 +94,10 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                     		$("#addResponse").text("Request has already been sent.");
                     		return false;
                     	}
+                    	else if(result == 5) {
+                    		$("#addResponse").text("Cannot add yourself.");
+                    		return false;
+                    	}
                     	else if(result == -1) {
                     		$("#addResponse").text("Request failed.");
                     		return false;
