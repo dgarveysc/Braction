@@ -162,11 +162,13 @@ if ((blap = currUsers.get(index)) != null) {
 	</form>
 </div>
  <div id="bracketName">
-
+<%
+out.print(b2.getName());
+%>
 </div>
 <div id="theGameType">
 <%
-out.print(b2.getGameType());
+out.print("This bracket is for " + b2.getGameType());
 %>
 </div>
 <div id="editing message">
