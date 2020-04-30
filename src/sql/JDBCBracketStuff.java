@@ -32,7 +32,7 @@ public class JDBCBracketStuff {
     private static final String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static SecureRandom random = new SecureRandom();
     
-    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=okamoto928";
+    public static final String CONNECTION_STRING = "jdbc:mysql://localhost/SportsWebsite?user=root&password=root";
     
     public static void initConnection() {
 		if (conn != null) {
@@ -897,6 +897,61 @@ public class JDBCBracketStuff {
 		return b;
 	}
 	
+	/**
+	 * 
+	 * @param requestID
+	 * @param receiveID
+	 * @return -1 if unknown failure, 0 if removing yourself, 1 if removing a nonexisting user, 2 if you are already friends, 3 if success
+	 */
+	public static int cancelFriends(int requestID, int receiveID) {
+		if (conn == null) {
+			JDBCBracketStuff.initConnection();
+		}
+		if (requestID == receiveID) {
+			return 0;
+		} else if (!userExists(receiveID)) {
+			return 1;
+		}
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		if (receiveID == -1) {
+			return 0;
+		} else if (isFriend(requestID, receiveID) == 1) {
+			return 2;
+		}
+		int result = -1;
+		try {
+			ps = conn.prepareStatement("SELECT friendID, acceptedStatus FROM Friends WHERE userID1=? AND userID2=? AND (acceptedStatus=3 OR acceptedStatus=10)");
+			ps.setString(1, Integer.toString(requestID));
+			ps.setString(2, Integer.toString(receiveID));
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				System.out.println("something found");
+				int friendID = rs.getInt(1);
+				int acceptedStatus = rs.getInt(2);
+				ps.close();
+				ps = conn.prepareStatement("DELETE FROM Friends WHERE friendID=?");
+				ps.setString(1, Integer.toString(friendID));
+				ps.executeUpdate();
+			}
+			result = 3;
+		} catch (SQLException sqle) {
+			System.out.println ("SQLException: " + sqle.getMessage());
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException sqle) {
+				System.out.println("sqle: " + sqle.getMessage());
+			}
+		}
+		return result;
+	}
+	
 	public static List<Stack<BracketOverview>> getUserOverview(int userID) {
 		if (conn == null) {
 			JDBCBracketStuff.initConnection();
@@ -906,7 +961,7 @@ public class JDBCBracketStuff {
 		List<Stack<BracketOverview>> tournaments = new LinkedList<>();
 		tournaments.add(new Stack<BracketOverview>());
 		tournaments.add(new Stack<BracketOverview>());
-		tournaments.add(new Stack<BracketOverview>());		
+		tournaments.add(new Stack<BracketOverview>());	
 		try {
 			ps = conn.prepareStatement("SELECT bracketID FROM UserToBracket WHERE userID=?");
 			ps.setString(1, Integer.toString(userID));
@@ -1216,7 +1271,7 @@ public class JDBCBracketStuff {
 	
 	public static void main(String[] args) {
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=okamoto928");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SportsWebsite?user=root&password=root");
 			BracketIdCodePair b = JDBCBracketStuff.createBracket(1, "godgamers", 1);
 			System.out.println("bracketCreated");
 			int godGamerID = 1;
