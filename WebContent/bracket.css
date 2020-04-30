@@ -25,13 +25,36 @@ input [type=button]{
 	border: 1px;
 }
 
+#theGameType {
+	color: #c6e3ff;
+	font-family: Helvetica, sans-serif;
+	margin-left: 40%;
+	margin-top: 1%;
+
+}
+
+#bracketName {
+	color: #ffffff;
+	font-family: Helvetica, sans-serif;
+	margin-left: 40%;
+	margin-top: 10%;
+	font-size: 1.5em;
+}
+
+#editing-message {
+	color: red;
+	font-family: Helvetica, sans-serif;
+	margin-top: 3%;
+	margin-left: 5%;
+}
+
 /* End CSS for Back Button */
 
 .wrapper {
   display: flex;
   height: 600px;
   justify-content: center;
-  margin-top: 10%;
+  margin-top: 4%;
 }
 
 .item {

@@ -12,6 +12,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
         <script src="myScript.js"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-165111822-1"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());  gtag('config', 'UA-165111822-1');
+		</script>
 
         <title>Braction Home</title>
 
@@ -307,6 +313,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
+                                            <th class="table-heading">Game Type</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -317,10 +324,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
 	                                                   String name = nextBracket.getName();
 	                                                   String hostName = nextBracket.getHostName();
 	                                                   int id = nextBracket.getId();
+	                                                   String gameTypeActive = nextBracket.getGameType();
                                             %>
                                         <tr>
                                                 <td class="item-text"><a href="DisplayBracket?bracketID=<%=id%>"><%= name %></a></td>
                                                 <td class="item-text"><%= hostName %></td>
+                                                <td class="item-text"><%= gameTypeActive %></td>
                                         </tr>
                                             <%
                                                 }
@@ -336,6 +345,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
+                                            <th class="table-heading">Game Type</th>
                                             <th class="table-heading">Vacant Spots</th>
                                         </tr>
                                         </thead>
@@ -348,10 +358,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                                    String hostName = nextBracket.getHostName();
                                                    int vacantSpots = nextBracket.getVacantSpots();
                                                    int id = nextBracket.getId();
+                                                   String gameTypePending = nextBracket.getGameType();
                                             %>
                                             <tr>
                                             	<td class="item-text"><a href="DisplayBracket?bracketID=<%=id%>"><%= name %></a></td>
                                                 <td class="item-text"><%= hostName %></td>
+                                            	<td class="item-text"><%= gameTypePending %></td>
                                                 <td class="item-text"><%= vacantSpots %></td>
                                             </tr>
                                             <%
@@ -367,6 +379,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                         <tr>
                                             <th class="table-heading">Tournament</th>
                                             <th class="table-heading">Host</th>
+                                            <th class="table-heading">Game Type</th>
                                             <th class="table-heading">Winner</th>
                                          </tr>
                                         </thead>
@@ -379,10 +392,12 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                                    String hostName = nextBracket.getHostName();
                                                    String winner = nextBracket.getWinnerName();
                                                    int id = nextBracket.getId();
+                                                   String gameTypeFinished = nextBracket.getGameType();
                                             %>
                                             <tr>
                                                 <td class="item-text"><a href="DisplayBracket?bracketID=<%=id%>"><%= name %></a></td>
                                                 <td class="item-text"><%= hostName %></td>
+                                                <td class="item-text"><%= gameTypeFinished %></td>
                                                 <td class="item-text"><%= winner %></td>
                                             </tr>
                                             <%
