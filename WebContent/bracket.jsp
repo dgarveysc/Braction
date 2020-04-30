@@ -24,13 +24,8 @@
 		//call servlet with whoever won
 		var winner=document.getElementById(lastWinner);
 		for(UserToStats u:currUsers){
-			if(u.getUser.getName==winner){
-				//then we update their win stat
-				u.setWon(1);//winners get won=1
-			}
-			else{
-				u.setWon(0);//players who didnt win get won=0
-			}
+			if(u.getUser.getName==winner) u.setWon(1);//winners get won=1
+			else u.setWon(0);//players who didnt win get won=0
 		}
 	}
 	
