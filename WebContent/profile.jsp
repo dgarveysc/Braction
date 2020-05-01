@@ -449,7 +449,7 @@ import="bracket.BracketOverview" import="java.util.List" import="java.util.Stack
                                             
                                             <tr>
                                                 <th class="table-heading">Username</th>
-                                                <th class="table-heading">Ranking</th>
+                                                <th class="table-heading">ELO</th>
                                             </tr>
                                             </thead>
                                             <tbody>
