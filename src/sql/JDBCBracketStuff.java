@@ -930,7 +930,6 @@ public class JDBCBracketStuff {
 		}
 		return b;
 	}
-	
 	/**
 	 * 
 	 * @param requestID
