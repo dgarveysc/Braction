@@ -9,7 +9,8 @@ import sys
 
 try:
     userID = sys.argv[1]
-    file = open("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userID + ".txt", "r")
+    masterString = sys.argv[2]
+    file = open(masterString + "src\\Stats\\" + userID + ".txt", "r")
 
     # process file, split it, then create boundaries
     yee = file.read()
@@ -34,7 +35,7 @@ try:
     ax.set_xlabel('Games Played')
     ax.set_ylabel('Elo')
 
-    plt.savefig("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\WebContent\\all" + str(userID)+'.png', dpi=400, bbox_inches='tight')
+    plt.savefig(masterString + "WebContent\\all" + str(userID)+'.png', dpi=400, bbox_inches='tight')
 
 
     if(len(eloStrList) >=20):  # make sure full graph displays without negative indices
@@ -42,12 +43,12 @@ try:
 
     ax.set_title('ELO over past 20 games')
     ax.set_xlabel('Games Range')
-    plt.savefig("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\WebContent\\twenty"+str(userID)+'.png', dpi=400, bbox_inches='tight')
+    plt.savefig(masterString + "WebContent\\twenty"+str(userID)+'.png', dpi=400, bbox_inches='tight')
 
     ax.set_title('ELO over past 5 games')
     if(len(eloStrList) >= 5):
         ax.set_xlim([len(eloStrList)-5, len(eloStrList)-1])
-    plt.savefig("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\WebContent\\five"+str(userID)+'.png', dpi=400, bbox_inches='tight')
+    plt.savefig(masterString + "WebContent\\five"+str(userID)+'.png', dpi=400, bbox_inches='tight')
 
     print("Success")
 except:

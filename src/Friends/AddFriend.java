@@ -53,6 +53,7 @@ public class AddFriend extends HttpServlet {
 		int result = -1;
 		if (success) {
 			String friendUsername = request.getParameter("friendUsername");
+			
 			result = JDBCBracketStuff.addFriend(userID, friendUsername);
 			System.out.println(result);
 		}

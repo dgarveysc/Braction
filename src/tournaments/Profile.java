@@ -37,6 +37,8 @@ import sql.JDBCBracketStuff;
  */
 @WebServlet("/Profile")
 public class Profile extends HttpServlet {
+	
+	private static final String masterString = "G:\\My Drive\\freshman\\spring\\CSCI 201\\eclipse-workspace\\201_FP\\";
 	private static final long serialVersionUID = 1L;
        
     /**
@@ -235,7 +237,7 @@ public class Profile extends HttpServlet {
 				//System.out.println(absolutePath);
 				
 				
-				PrintWriter pw = new PrintWriter("C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\" + userIDString + ".txt");
+				PrintWriter pw = new PrintWriter(masterString + "src\\Stats\\" + userIDString + ".txt");
 	
 				int curElo = 1000;
 	
@@ -274,7 +276,7 @@ public class Profile extends HttpServlet {
 				System.out.println("Got here 4");
 	
 	
-				ProcessBuilder pb = new ProcessBuilder("python", "C:\\Users\\sokam\\eclipse-workspace\\Braction_FinalProject\\src\\Stats\\plot.py", userIDString);
+				ProcessBuilder pb = new ProcessBuilder("python", masterString + "src\\Stats\\plot.py", userIDString, masterString);
 				Process p = pb.start();
 				// matPlotLib will output fiveID.png, twentyID.png, and allID.png, for rank change graphs
 				// wait until done then continue with other stuff
@@ -438,40 +440,11 @@ public class Profile extends HttpServlet {
 				request.setAttribute("lose50", lose50);
 				request.setAttribute("lose75", lose75);
 				
-				
 				request.setAttribute("avgOppRank", avgOppRank);
 				request.setAttribute("avgRound", avgRound);
 				request.setAttribute("numBWins", numBWins);
 				request.setAttribute("elo", curElo);
 				
-				// here System printing
-				System.out.println("numPlayed" + numPlayed);
-				System.out.println("numWins" + numWins);
-				System.out.println("numLosses" + numLosses);
-	
-				System.out.println("avgOppW5" + wRank5);
-				System.out.println("avgOppW20" + wRank20);
-				System.out.println("avgOppWAll" + wRankAll);
-				
-				System.out.println("avgOppL5" + lRank5);
-				System.out.println("avgOppL20" + lRank20);
-				System.out.println("avgOppLAll" + lRankAll);
-	
-				
-				System.out.println("win25" + win25);
-				System.out.println("win50" + win50);
-				System.out.println("win75" + win75);
-				System.out.println("lose25" + lose25);
-				System.out.println("lose50" + lose50);
-				System.out.println("lose75" + lose75);
-				
-				
-				System.out.println("avgOppRank" + avgOppRank);
-				System.out.println("avgRound" + avgRound);
-				System.out.println("numBWins" + numBWins);
-				System.out.println("elo" + curElo);
-	
-	
 				if(numPlayed != 0)
 				{
 					request.setAttribute("img5", "five"+testID + ".png");
